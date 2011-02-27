@@ -1,0 +1,4 @@
+sent,0,SET SILENT_MODE ON
+sent,3000,PING
+received,3000,PONG
+received,4500,SILENT_MODE ON
