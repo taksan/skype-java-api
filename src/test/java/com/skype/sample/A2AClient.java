@@ -26,9 +26,9 @@ import java.util.Arrays;
 import com.skype.*;
 
 public class A2AClient {
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
         Skype.setDebug(true);
-        Skype.setDeamon(false);
+        Skype.setDaemon(false);
         String name = A2AClient.class.getName();
         Stream[] streams = connectToServer(name);
         

@@ -61,7 +61,8 @@ public final class WindowsConnector extends Connector {
      * This response is sent when the client is attached.
      * </p>
      */
-    private static final int ATTACH_SUCCESS = 0;
+    @SuppressWarnings("unused")
+	private static final int ATTACH_SUCCESS = 0;
 
     /**
      * The pending authorization response type (value is 1).
@@ -71,7 +72,8 @@ public final class WindowsConnector extends Connector {
      * wait for the {@ses #ATTACH_SUCCESS} message.
      * </p>
      */
-    private static final int ATTACH_PENDING_AUTHORIZATION = 1;
+    @SuppressWarnings("unused")
+	private static final int ATTACH_PENDING_AUTHORIZATION = 1;
 
     /**
      * The refused response type (value is 2).
@@ -80,7 +82,8 @@ public final class WindowsConnector extends Connector {
      * the client.
      * </p>
      */
-    private static final int ATTACH_REFUSED = 2;
+    @SuppressWarnings("unused")
+	private static final int ATTACH_REFUSED = 2;
 
     /**
      * The not available response type (value is 3).
@@ -91,14 +94,16 @@ public final class WindowsConnector extends Connector {
      * again.
      * </p>
      */
-    private static final int ATTACH_NOT_AVAILABLE = 3;
+    @SuppressWarnings("unused")
+	private static final int ATTACH_NOT_AVAILABLE = 3;
 
     /**
      * The available response type (value is 0x8001).
      * <p>
      * This response is sent when the API becomes available.
      */
-    private static final int ATTACH_API_AVAILABLE = 0x8001;
+    @SuppressWarnings("unused")
+	private static final int ATTACH_API_AVAILABLE = 0x8001;
 
     /**
      * The window handle indicating all top-level windows in the system.
@@ -119,7 +124,8 @@ public final class WindowsConnector extends Connector {
      * 
      * @see #DISCOVER_MESSAGE_ID
      */
-    private static final int ATTACH_MESSAGE_ID = OS.RegisterWindowMessage(new TCHAR(0, "SkypeControlAPIAttach", true));
+    @SuppressWarnings("unused")
+	private static final int ATTACH_MESSAGE_ID = OS.RegisterWindowMessage(new TCHAR(0, "SkypeControlAPIAttach", true));
 
     /**
      * The window message type of the request to initiate communication with Skype.
@@ -348,61 +354,6 @@ public final class WindowsConnector extends Connector {
         execute(command, new String[] {command}, false);
     }
     
-    /**
-     * Gets called when a message is received.
-     * @param hwnd Skype client window handle.
-     * @param msg The message received.
-     * @param wParam The window parameter.
-     * @param lParam The lparam.
-     * @return Status value.
-     */
-    private int messageReceived(final int hwnd, final int msg, final int wParam, final int lParam) {
-        // Using 'if' statement because ATTACH_MESSAGE_ID is not a compile time constant
-        if(msg == ATTACH_MESSAGE_ID) {
-            switch(lParam) {
-                case ATTACH_PENDING_AUTHORIZATION:
-                    setStatus(Status.PENDING_AUTHORIZATION);
-                    break;
-                case ATTACH_SUCCESS:
-                    skypeWindowHandle = wParam;
-                    setStatus(Status.ATTACHED);
-                    break;
-                case ATTACH_REFUSED:
-                    setStatus(Status.REFUSED);
-                    break;
-                case ATTACH_NOT_AVAILABLE:
-                    setStatus(Status.NOT_AVAILABLE);
-                    break;
-                case ATTACH_API_AVAILABLE:
-                    setStatus(Status.API_AVAILABLE);
-                    break;
-                default:
-                    setStatus(Status.NOT_RUNNING);
-                    break;
-            }
-            return 1;
-        } else if(msg == WM_COPYDATA) {
-            if(wParam == skypeWindowHandle) {
-                final int[] data = new int[3];
-                OS.MoveMemory(data, lParam, 12);
-                final int cbData = data[1];
-                final int lpData = data[2];
-                final int length = cbData;
-                final byte[] buffer = new byte[length];
-                OS.MoveMemory(buffer, lpData, length);
-                final byte[] string = new byte[buffer.length - 1];
-                System.arraycopy(buffer, 0, string, 0, string.length);
-                try {
-                    final String message = new String(string, "UTF-8");
-                    fireMessageReceived(message);
-                    return 1;
-                } catch(UnsupportedEncodingException e) {
-                }
-            }
-        }
-        return OS.DefWindowProc(hwnd, msg, wParam, lParam);
-    }
-
     /**
      * Clean up and disconnect.
      */

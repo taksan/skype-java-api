@@ -27,7 +27,7 @@ import com.skype.SkypeException;
 
 public class CallStopper {
     public static void main(String[] args) throws Exception {
-        Skype.setDeamon(false);
+        Skype.setDaemon(false);
         Skype.addCallListener(new CallAdapter() {
             @Override
             public void callMaked(Call makedCall) throws SkypeException {

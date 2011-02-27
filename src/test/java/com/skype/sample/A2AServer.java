@@ -26,7 +26,7 @@ import com.skype.*;
 public class A2AServer {
     public static void main(String[] args) throws Exception {
         Skype.setDebug(true);
-        Skype.setDeamon(false);
+        Skype.setDaemon(false);
         Application application = Skype.addApplication(A2AClient.class.getName());
         application.addApplicationListener(new ApplicationAdapter() {
             @Override

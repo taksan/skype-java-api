@@ -28,7 +28,7 @@ import com.skype.SkypeException;
 
 public class AutoAnswering {
     public static void main(String[] args) throws Exception {
-        Skype.setDeamon(false); // to prevent exiting from this program
+        Skype.setDaemon(false); // to prevent exiting from this program
         Skype.addChatMessageListener(new ChatMessageAdapter() {
             public void chatMessageReceived(ChatMessage received) throws SkypeException {
                 if (received.getType().equals(ChatMessage.Type.SAID)) {

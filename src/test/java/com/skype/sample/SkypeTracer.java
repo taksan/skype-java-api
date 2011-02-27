@@ -39,6 +39,7 @@ import com.skype.connector.ConnectorException;
 import com.skype.connector.MessageProcessor;
 import com.skype.connector.osx.OSXConnector;
 
+@SuppressWarnings("deprecation")
 public class SkypeTracer extends Shell {
     public static void main(final String args[]) throws Exception {
         OSXConnector.disableSkypeEventLoop();
@@ -108,7 +109,7 @@ public class SkypeTracer extends Shell {
             public void widgetSelected(SelectionEvent event) {
                 final String command = toSkype.getText();
                 new Thread() {
-                    @Override
+					@Override
                     public void run() {
                         try {
                             Connector.getInstance().execute(command, new MessageProcessor() {

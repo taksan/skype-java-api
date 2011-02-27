@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 
 public class CallForwardingTest extends TestCase {
     public void testSetCallForwarding() throws Exception {
-        Skype.setDeamon(true);
+        Skype.setDaemon(true);
         Skype.setDebug(true);
         Skype.getProfile().setStatus(Status.OFFLINE);
         // CallForwardingRule[] oldCallForwardingRules =

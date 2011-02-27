@@ -141,7 +141,8 @@ public final class Stream extends SkypeObject {
             String header = "ALTER APPLICATION " + getApplication().getName() + " WRITE " + getId();
             ApplicationListener applicationListener = null;
             try {
-                final Future<String> future = Connector.getInstance().waitForEndWithId(header + " " + text, header, checker);
+                @SuppressWarnings("unchecked")
+				final Future<String> future = Connector.getInstance().waitForEndWithId(header + " " + text, header, checker);
                 applicationListener = new ApplicationAdapter() {
                     @Override
                     public void disconnected(Stream stream) throws SkypeException {

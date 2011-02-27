@@ -28,7 +28,7 @@ import com.skype.Profile.CallForwardingRule;
 
 public class CallForwarder {
     public static void main(String[] args) throws Exception {
-        Skype.setDeamon(false);
+        Skype.setDaemon(false);
         Skype.addCallListener(new CallAdapter() {
             @Override
             public void callReceived(Call receivedCall) throws SkypeException {

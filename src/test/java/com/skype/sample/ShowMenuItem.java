@@ -30,7 +30,7 @@ import com.skype.SkypeException;
 public class ShowMenuItem {
     public static void main(String[] args) throws Exception {
         Skype.setDebug(true);
-        Skype.setDeamon(false);
+        Skype.setDaemon(false);
         
         final MenuItem item = SkypeClient.addMenuItem(MenuItem.Context.TOOLS, "Test menu", null, null, true, null, true);
         item.addMenuItemListener(new MenuItemListener() {

@@ -24,6 +24,7 @@ package com.skype.connector;
 /**
  * This exception will be thrown when loading a library failed.
  */
+@SuppressWarnings("serial")
 public final class LoadLibraryException extends ConnectorException {
 	/**
 	 * Constructor with a message.
