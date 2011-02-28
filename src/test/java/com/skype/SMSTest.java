@@ -21,11 +21,15 @@
  ******************************************************************************/
 package com.skype;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public final class SMSTest extends TestCase {
+@Ignore
+public final class SMSTest {
+	@Test
     public void testSendSMS() throws SkypeException {
         SMS message = Skype.sendSMS(TestData.getSMSNumber(), "test");
-        assertEquals("test", message.getContent());
+        Assert.assertEquals("test", message.getContent());
     }
 }

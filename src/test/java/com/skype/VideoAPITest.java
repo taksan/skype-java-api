@@ -21,9 +21,13 @@
  ******************************************************************************/
 package com.skype;
 
-import junit.framework.TestCase;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class VideoAPITest extends TestCase {
+
+@Ignore
+public class VideoAPITest {
+	@Test
     public void testGetVideoDevice() throws Exception {
         String name = Skype.getVideoDevice();
         if (name == null) {
@@ -31,13 +35,14 @@ public class VideoAPITest extends TestCase {
         }
         TestUtils.showCheckDialog("Webcam is '" + name + "'?");
     }
-
+	@Test
     public void testOpenVideoTestWindow() throws Exception {
         SkypeClient.openVideoTestWindow();
         TestUtils.showCheckDialog("Webcam test window is showed?");
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testOpenVideoOptionsWindow() throws Exception {
         SkypeClient.openVideoOptionsWindow();
         TestUtils.showCheckDialog("Options window with selectiong 'Video' page is showed?");

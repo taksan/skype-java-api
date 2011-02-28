@@ -65,7 +65,7 @@ public class AutoVoiceMailAPITest extends TestCaseByCSVFile {
         }
     }
     
-    public void testVoiceMailStatusChangedListener() throws Exception {
+    public void ignore_testVoiceMailStatusChangedListener() throws Exception {
         VoiceMail voiceMail = Skype.voiceMail("echo123");
         final List<Status> statuses = new ArrayList<Status>();
         final Object wait = new Object();

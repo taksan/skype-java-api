@@ -21,14 +21,19 @@
  ******************************************************************************/
 package com.skype;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public final class SkypeExceptionHandlerTest extends TestCase {
+@Ignore
+public final class SkypeExceptionHandlerTest {
+	@Test
     public void testDefaultHanlder() throws Exception {
         fireHanlderWithSkypeException();
         TestUtils.showCheckDialog("The default output contains a stack trace?");
     }
 
+	@Test
     public void testSetHandler() throws Exception {
         final Object wait = new Object();
         final boolean[] result = new boolean[1];
@@ -47,7 +52,7 @@ public final class SkypeExceptionHandlerTest extends TestCase {
             } catch (InterruptedException e) {
             }
         }
-        assertTrue(result[0]);
+        Assert.assertTrue(result[0]);
         
         Skype.setSkypeExceptionHandler(null);
         fireHanlderWithSkypeException();

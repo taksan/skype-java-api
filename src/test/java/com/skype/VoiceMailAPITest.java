@@ -20,9 +20,12 @@
  ******************************************************************************/
 package com.skype;
 
-import junit.framework.TestCase;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class VoiceMailAPITest extends TestCase {
+@Ignore
+public class VoiceMailAPITest  {
+	@Test
     public void testLeaveVoiceMail() throws Exception {
         TestData.getFriend().voiceMail();
         TestUtils.showCheckDialog(TestData.getFriend().getId() + " has received a voicemail?");

@@ -23,9 +23,14 @@ package com.skype;
 
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class CallAPITest extends TestCase {
+// non automatic tests
+@Ignore
+public class CallAPITest {
+	@Test
     public void testCallAndFinish() throws Exception {
         TestUtils.showMessageDialog("Please, check " + TestData.getFriendId() + " will receive a call and it will be finished after two seconds?");
         Friend friend = Skype.getContactList().getFriend(TestData.getFriendId());
@@ -35,6 +40,7 @@ public class CallAPITest extends TestCase {
         TestUtils.showCheckDialog(TestData.getFriendId() + " has received a call and it was finished after two seconds?");
     }
 
+	@Test
     public void testFinishEndedCall() throws Exception {
         Friend friend = Skype.getContactList().getFriend(TestData.getFriendId());
         Call call = friend.call();
@@ -43,11 +49,12 @@ public class CallAPITest extends TestCase {
         try {
             call.finish();
         } catch (CommandFailedException e) {
-            assertEquals(24, e.getCode());
-            assertEquals("Cannot hangup inactive call", e.getMessage());
+            Assert.assertEquals(24, e.getCode());
+            Assert.assertEquals("Cannot hangup inactive call", e.getMessage());
         }
     }
 
+	@Test
     public void testHoldAndResume() throws Exception {
         TestUtils.showMessageDialog("Please, start a talking with " + TestData.getFriendId() + " in ten seconds after starting a call.");
         Friend friend = Skype.getContactList().getFriend(TestData.getFriendId());
@@ -62,6 +69,7 @@ public class CallAPITest extends TestCase {
         TestUtils.showCheckDialog("You have gotton a 2 seconds suspending, and 2 seconds talking?");
     }
 
+	@Test
     public void testCallProperty() throws Exception {
         Date startTime = new Date();
         TestUtils.showMessageDialog("Please, start a talking with " + TestData.getFriendId() + " and finish in ten seconds after starting a call.");
@@ -69,12 +77,13 @@ public class CallAPITest extends TestCase {
         Call call = friend.call();
         Thread.sleep(10000);
         Date endTime = new Date();
-        assertTrue(call.getStartTime().getTime() - startTime.getTime() <= endTime.getTime() - startTime.getTime());
-        assertTrue(call.getDuration() <= endTime.getTime() - startTime.getTime());
-        assertEquals(TestData.getFriendId(), call.getPartnerId());
-        assertEquals(TestData.getFriendDisplayName(), call.getPartnerDisplayName());
+        Assert.assertTrue(call.getStartTime().getTime() - startTime.getTime() <= endTime.getTime() - startTime.getTime());
+        Assert.assertTrue(call.getDuration() <= endTime.getTime() - startTime.getTime());
+        Assert.assertEquals(TestData.getFriendId(), call.getPartnerId());
+        Assert.assertEquals(TestData.getFriendDisplayName(), call.getPartnerDisplayName());
     }
-
+	
+	@Test
     public void testCallReceived() throws Exception {
         final Object wait = new Object();
         final Call[] result = new Call[1];
@@ -91,6 +100,6 @@ public class CallAPITest extends TestCase {
         synchronized(wait) {
             wait.wait();
         }
-        assertEquals(TestData.getFriendId(), result[0].getPartnerId());
+        Assert.assertEquals(TestData.getFriendId(), result[0].getPartnerId());
     }
 }

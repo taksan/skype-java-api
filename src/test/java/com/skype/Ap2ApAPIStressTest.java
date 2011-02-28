@@ -21,9 +21,10 @@
 package com.skype;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
-
+@Ignore
 public final class Ap2ApAPIStressTest {
     static final String APPLICATION_NAME = Ap2ApAPIStressTest.class.getName();
 

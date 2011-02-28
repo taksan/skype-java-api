@@ -21,13 +21,17 @@
  ******************************************************************************/
 package com.skype;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class SkypeObjectTest extends TestCase {
+@Ignore
+public class SkypeObjectTest  {
+	@Test
     public void testBasic() throws Exception {
         String name = "name";
         Object userData = new Object();
         TestData.getFriend().setData(name, userData);
-        assertEquals(userData, TestData.getFriend().getData(name));
+        Assert.assertEquals(userData, TestData.getFriend().getData(name));
     }
 }

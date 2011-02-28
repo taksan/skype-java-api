@@ -20,8 +20,6 @@
  ******************************************************************************/
 package com.skype.connector.windows;
 
-import junit.framework.TestCase;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,11 +27,16 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import com.skype.Skype;
 import com.skype.SkypeException;
 
-public final class EventDispatchThreadTest extends TestCase {
+@Ignore
+public final class EventDispatchThreadTest {
+	@Test
     public void testEventDispatchThreadInMainMethod() throws Exception {
         final Display display = Display.getDefault();
         final Shell shell = new Shell(display);
@@ -58,6 +61,6 @@ public final class EventDispatchThreadTest extends TestCase {
             }
         }
         display.dispose();
-        assertNotNull(version[0]);
+        Assert.assertNotNull(version[0]);
     }
 }

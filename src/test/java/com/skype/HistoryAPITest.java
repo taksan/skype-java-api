@@ -22,29 +22,30 @@ package com.skype;
 
 import java.util.Date;
 
-import com.skype.Call;
-import com.skype.ChatMessage;
-import com.skype.Friend;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class HistoryAPITest extends TestCase {
+@Ignore
+public class HistoryAPITest  {
+	@Test
     public void testGetAllMessages() throws Exception {
         TestUtils.showMessageDialog("Please, send a chat message 'Hello, World!' to " + TestData.getFriendId() + ".");
         Friend friend = TestData.getFriend();
         ChatMessage[] messages = friend.getAllChatMessages();
-        assertTrue(0 < messages.length);
+        Assert.assertTrue(0 < messages.length);
     }
 
+	@Test
     public void testGetAllCalls() throws Exception {
         TestUtils.showMessageDialog("Please, start a call to " + TestData.getFriendId() + "and finsh it in 10 seconds.");
         Friend friend = TestData.getFriend();
         Call[] calls = friend.getAllCalls();
-        assertTrue(0 < calls.length);
+        Assert.assertTrue(0 < calls.length);
         Call latest = calls[0];
-        assertEquals(TestData.getFriendId(), latest.getPartnerId());
-        assertEquals(TestData.getFriendDisplayName(), latest.getPartnerDisplayName());
-        assertTrue(new Date().getTime() - 10000 <= latest.getStartTime().getTime());
-        assertEquals(Call.Type.OUTGOING_P2P, latest.getType());
+        Assert.assertEquals(TestData.getFriendId(), latest.getPartnerId());
+        Assert.assertEquals(TestData.getFriendDisplayName(), latest.getPartnerDisplayName());
+        Assert.assertTrue(new Date().getTime() - 10000 <= latest.getStartTime().getTime());
+        Assert.assertEquals(Call.Type.OUTGOING_P2P, latest.getType());
     }
 }

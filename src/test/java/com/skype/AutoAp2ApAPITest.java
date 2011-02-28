@@ -21,14 +21,13 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.connector.test.TestCaseByCSVFile;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class AutoAp2ApAPITest extends TestCaseByCSVFile {
-    @Override
-    protected void setUp() throws Exception {
-        setRecordingMode(false);
-    }
+@Ignore
+public class AutoAp2ApAPITest  {
 
+	@Test
     public void testRecreatingApplication() throws Exception {
         String APPLICATION_NAME = "test";
         Application application = Skype.addApplication(APPLICATION_NAME);
@@ -37,6 +36,7 @@ public class AutoAp2ApAPITest extends TestCaseByCSVFile {
         application.finish();
     }
 
+	@Test
     public void testDoubleConnecting() throws Exception {
         Application application = Skype.addApplication("test");
         Stream[] streams = application.connect("echo123");

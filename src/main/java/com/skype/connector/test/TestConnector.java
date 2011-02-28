@@ -27,12 +27,23 @@ import com.skype.connector.*;
 
 public final class TestConnector extends Connector {
     private static class Holder {
-        static final TestConnector instance = new TestConnector();
+        static TestConnector instance = new TestConnector();
+        static TestConnector getInstance() {
+        	return instance;
+        }
+		public static void resetInstance() {
+			instance = new TestConnector();			
+		}
     }
+    
+
+	public static void resetInstance() {
+		Holder.resetInstance();
+	}
 
     public static TestConnector getInstance() {
         // http://en.wikipedia.org/wiki/Initialization_on_Demand_Holder_Idiom
-        return Holder.instance;
+        return Holder.getInstance();
     }
 
     private Object recordingFieldsMutex = new Object();
@@ -190,6 +201,8 @@ public final class TestConnector extends Connector {
 
     public void clearPlayer() throws ConnectorException {
         synchronized(playingFieldsMutex) {
+        	if (playerThread == null)
+        		return;
             playerThread.interrupt();
             playerThread = null;
             Connector.getInstance().removeConnectorListener(playingLister);
@@ -219,4 +232,5 @@ public final class TestConnector extends Connector {
     @Override
     protected void disposeImpl() {
     }
+
 }

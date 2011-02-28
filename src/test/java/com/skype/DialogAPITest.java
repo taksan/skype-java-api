@@ -23,9 +23,12 @@ package com.skype;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class DialogAPITest extends TestCase {
+@Ignore
+public class DialogAPITest {
+	@Test
     public void testShowMainWindow() throws Exception {
         SkypeClient.showSkypeWindow();
         TestUtils.showCheckDialog("Skype main window is showed on the top?");
@@ -33,6 +36,7 @@ public class DialogAPITest extends TestCase {
         TestUtils.showCheckDialog("Skype main window is minimized?");
     }
 
+	@Test
     public void testShowAddFriendWindow() throws Exception {
         SkypeClient.showAddFriendWindow();
         TestUtils.showCheckDialog("'Add a Contact' window is showed?");
@@ -42,6 +46,7 @@ public class DialogAPITest extends TestCase {
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testShowChatWindow() throws Exception {
         SkypeClient.showChatWindow(TestData.getFriendId());
         TestUtils.showCheckDialog("Chat window with " + TestData.getFriendId() + " is showed?");
@@ -51,6 +56,7 @@ public class DialogAPITest extends TestCase {
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testShowFileTransferWindow() throws Exception {
         SkypeClient.showFileTransferWindow(TestData.getFriendId());
         TestUtils.showCheckDialog("'Send file to " + TestData.getFriendId() + "' window is showed?");
@@ -60,30 +66,35 @@ public class DialogAPITest extends TestCase {
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testShowProfileWindow() throws Exception {
         SkypeClient.showProfileWindow();
         TestUtils.showCheckDialog("Profile window is showed?");
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testShowUserInformationWindow() throws Exception {
         SkypeClient.showUserInformationWindow(TestData.getFriendId());
         TestUtils.showCheckDialog(TestData.getFriendId() + "'s profile window is showed?");
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testShowConferenceWindow() throws Exception {
         SkypeClient.showConferenceWindow();
         TestUtils.showCheckDialog("'Start a Skype Conference Call' window is showed?");
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testShowSearchWindow() throws Exception {
         SkypeClient.showSearchWindow();
         TestUtils.showCheckDialog("'Search for Skype Users' window is showed?");
         TestUtils.showMessageDialog("Please, close the window before the next step.");
     }
 
+	@Test
     public void testShowOptionsWindow() throws Exception {
         SkypeClient.showOptionsWindow(SkypeClient.OptionsPage.ADVANCED);
         TestUtils.showCheckDialog("Options window with selecting 'Advanced' page is showed?");

@@ -20,24 +20,28 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.Skype;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public final class PhoneAPITest extends TestCase {
+// not supported on linux
+@Ignore
+public final class PhoneAPITest {
+	@Test
     public void testAudioInputDevice() throws Exception {
         String device = Skype.getAudioInputDevice();
         Skype.setAudioInputDevice(null);
-        assertNull(Skype.getAudioInputDevice());
+        Assert.assertNull(Skype.getAudioInputDevice());
         Skype.setAudioInputDevice(device);
-        assertEquals(device, Skype.getAudioInputDevice());
+        Assert.assertEquals(device, Skype.getAudioInputDevice());
     }
 
+	@Test
     public void testAudioOutputDevice() throws Exception {
         String device = Skype.getAudioOutputDevice();
         Skype.setAudioOutputDevice(null);
-        assertNull(Skype.getAudioOutputDevice());
+        Assert.assertNull(Skype.getAudioOutputDevice());
         Skype.setAudioOutputDevice(device);
-        assertEquals(device, Skype.getAudioOutputDevice());
+        Assert.assertEquals(device, Skype.getAudioOutputDevice());
     }
 }

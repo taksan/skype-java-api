@@ -21,8 +21,12 @@
 package com.skype;
 
 import java.util.Properties;
+
+import org.junit.Ignore;
+
 import junit.framework.Assert;
 
+@Ignore
 @SuppressWarnings("rawtypes")
 final class TestCaseProperties {
 	private final Class testCaseClass;

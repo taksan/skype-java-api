@@ -20,35 +20,38 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.Friend;
-import com.skype.Group;
-import com.skype.Skype;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+@Ignore 
+public class GroupAPITest {
 
-public class GroupAPITest extends TestCase {
+	@Test
     public void testGetGroup() throws Exception {
         TestUtils.showMessageDialog("Please create 'Test' group and add " + TestData.getFriendId() + " to it before closing this dialog.");
         Group group = Skype.getContactList().getGroup("Test");
-        assertNotNull(group);
-        assertTrue(group.hasFriend(TestData.getFriend()));
+        Assert.assertNotNull(group);
+        Assert.assertTrue(group.hasFriend(TestData.getFriend()));
     }
 
+	@Test
     public void testAddAndRemoveGroup() throws Exception {
         String addedGroupName = "GroupAPITest";
         Group added = Skype.getContactList().addGroup(addedGroupName);
-        assertNotNull(Skype.getContactList().getGroup(addedGroupName));
+        Assert.assertNotNull(Skype.getContactList().getGroup(addedGroupName));
         Skype.getContactList().removeGroup(added);
-        assertNull(Skype.getContactList().getGroup(addedGroupName));
+        Assert.assertNull(Skype.getContactList().getGroup(addedGroupName));
     }
 
+	@Test
     public void testAddAndRemoveFriend() throws Exception {
         Group addedGroup = Skype.getContactList().addGroup("GroupAPITest");
         Friend addedFriend = TestData.getFriend();
         addedGroup.addFriend(addedFriend);
-        assertTrue(addedGroup.hasFriend(addedFriend));
+        Assert.assertTrue(addedGroup.hasFriend(addedFriend));
         addedGroup.removeFriend(addedFriend);
-        assertFalse(addedGroup.hasFriend(addedFriend));
+        Assert.assertFalse(addedGroup.hasFriend(addedFriend));
         Skype.getContactList().removeGroup(addedGroup);
     }
 }

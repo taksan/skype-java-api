@@ -21,11 +21,15 @@
  ******************************************************************************/
 package com.skype;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public final class Ap2ApAPITest extends TestCase {
+@Ignore
+public final class Ap2ApAPITest {
     static final String APPLICATION_NAME = Ap2ApAPITest.class.getName();
 
+    @Test
     public void testApplication() throws Exception {
         Skype.setDebug(true);
         Application application = Skype.addApplication(APPLICATION_NAME);
@@ -33,7 +37,7 @@ public final class Ap2ApAPITest extends TestCase {
         checkConnectableFriendsBeforeConnecting(application);
         try {
             Stream[] streams = application.connect(friend);
-            assertEquals(1, streams.length);
+            Assert.assertEquals(1, streams.length);
             Stream stream = streams[0];
             checkConnectableFriendsAfterConnecting(application);
             checkConnectedFriends(application, friend);
@@ -47,18 +51,18 @@ public final class Ap2ApAPITest extends TestCase {
 
     private void checkConnectableFriendsBeforeConnecting(Application application) throws SkypeException {
         Friend[] connectableFriends = application.getAllConnectableFriends();
-        assertTrue(1 <= connectableFriends.length);
+        Assert.assertTrue(1 <= connectableFriends.length);
     }
 
     private void checkConnectableFriendsAfterConnecting(Application application) throws SkypeException {
         Friend[] connectableFriends = application.getAllConnectableFriends();
-        assertTrue(0 <= connectableFriends.length);
+        Assert.assertTrue(0 <= connectableFriends.length);
     }
 
     private void checkConnectedFriends(Application application, Friend friend) throws SkypeException {
         Friend[] connectableFriends = application.getAllConnectedFriends();
-        assertEquals(1, connectableFriends.length);
-        assertEquals(friend, connectableFriends[0]);
+        Assert.assertEquals(1, connectableFriends.length);
+        Assert.assertEquals(friend, connectableFriends[0]);
     }
 
     private void checkWrite(Stream stream) throws Exception {
@@ -78,10 +82,10 @@ public final class Ap2ApAPITest extends TestCase {
             try {
                 lock.wait(10000);
             } catch (InterruptedException e) {
-                fail();
+                Assert.fail();
             }
         }
-        assertEquals("Hello, World!", result[0]);
+        Assert.assertEquals("Hello, World!", result[0]);
     }
 
     private void checkSend(Stream stream) throws Exception {
@@ -101,10 +105,10 @@ public final class Ap2ApAPITest extends TestCase {
             try {
                 lock.wait(10000);
             } catch (InterruptedException e) {
-                fail();
+                Assert.fail();
             }
         }
-        assertEquals("Hello, World!", result[0]);
+        Assert.assertEquals("Hello, World!", result[0]);
     }
 
     private void checkDisconnect(Application application, Stream stream) throws Exception {
@@ -124,9 +128,9 @@ public final class Ap2ApAPITest extends TestCase {
             try {
                 lock.wait(10000);
             } catch (InterruptedException e) {
-                fail();
+                Assert.fail();
             }
         }
-        assertTrue(result[0]);
+        Assert.assertTrue(result[0]);
     }
 }

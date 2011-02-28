@@ -20,22 +20,25 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.Skype;
+import org.junit.Assert;
+import org.junit.Test;
 
-import junit.framework.TestCase;
 
-public class SystemTest extends TestCase {
+public class SystemTest  {
+	@Test
     public void testIsInstalled() throws Exception {
-        assertTrue(Skype.isInstalled());
+        Assert.assertTrue(Skype.isInstalled());
     }
 
+	@Test
     public void testIsRunning() throws Exception {
-        assertTrue(Skype.isRunning());
+    	Assert.assertTrue(Skype.isRunning());
     }
 
+	@Test
     public void testGetVersion() throws Exception {
         String version = Skype.getVersion();
-        assertNotNull(version);
-        assertTrue(!"".equals(version));
+        Assert.assertNotNull(version);
+        Assert.assertTrue(!"".equals(version));
     }
 }

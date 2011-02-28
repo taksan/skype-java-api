@@ -23,8 +23,11 @@ package com.skype;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import org.junit.Ignore;
+
 import junit.framework.Assert;
 
+@Ignore
 public final class TestUtils {
     public static void showCheckDialog(String message) {
         JOptionPane pane = new JOptionPane(message, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);

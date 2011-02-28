@@ -40,6 +40,7 @@ public final class AutoConnectorTest extends TestCaseByCSVFile {
     }
 
     public void testCall() throws Exception {
+    	TestConnector.resetInstance();
         Call call = Skype.getContactList().getFriend("echo123").call();
         Thread.sleep(5000);
         call.finish();

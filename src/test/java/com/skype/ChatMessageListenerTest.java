@@ -20,13 +20,13 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.ChatMessage;
-import com.skype.ChatMessageAdapter;
-import com.skype.Skype;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class ChatMessageListenerTest extends TestCase {
+@Ignore
+public class ChatMessageListenerTest {
+	@Test
     public void testBasic() throws Exception {
         final boolean[] sent = new boolean[1];
         Skype.addChatMessageListener(new ChatMessageAdapter() {
@@ -37,7 +37,7 @@ public class ChatMessageListenerTest extends TestCase {
             }
         });
         TestUtils.showMessageDialog("Please, send a chat message to " + TestData.getFriendId() + ".");
-        assertTrue(sent[0]);
+        Assert.assertTrue(sent[0]);
 
         final boolean[] received = new boolean[1];
         Skype.addChatMessageListener(new ChatMessageAdapter() {
@@ -48,6 +48,6 @@ public class ChatMessageListenerTest extends TestCase {
             }
         });
         TestUtils.showMessageDialog("Please, receive a chat message from " + TestData.getFriendId() + ".");
-        assertTrue(received[0]);
+        Assert.assertTrue(received[0]);
     }
 }

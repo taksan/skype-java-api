@@ -21,14 +21,15 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.Call;
-import com.skype.CallAdapter;
-import com.skype.Skype;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.skype.Call.Status;
 
-import junit.framework.TestCase;
-
-public class CallStatusChangedListenerTest extends TestCase {
+@Ignore
+public class CallStatusChangedListenerTest {
+	@Test
     public void testBasic() throws Exception {
         final StringBuffer statuses = new StringBuffer();
         Skype.addCallListener(new CallAdapter() {
@@ -42,6 +43,6 @@ public class CallStatusChangedListenerTest extends TestCase {
             }
         });
         TestUtils.showMessageDialog("Please, make a call to " + TestData.getFriendId() + " and finish.");
-        assertEquals("[RINGING][CANCELLED]", statuses.toString());
+        Assert.assertEquals("[RINGING][CANCELLED]", statuses.toString());
     }
 }

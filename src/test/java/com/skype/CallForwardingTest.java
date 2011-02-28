@@ -20,13 +20,15 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.Skype;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.skype.Profile.CallForwardingRule;
 import com.skype.Profile.Status;
 
-import junit.framework.TestCase;
-
-public class CallForwardingTest extends TestCase {
+@Ignore
+public class CallForwardingTest {
+	@Test
     public void testSetCallForwarding() throws Exception {
         Skype.setDaemon(true);
         Skype.setDebug(true);

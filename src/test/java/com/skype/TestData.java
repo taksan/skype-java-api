@@ -21,10 +21,13 @@
  ******************************************************************************/
 package com.skype;
 
+import org.junit.Ignore;
+
 import com.skype.Friend;
 import com.skype.Skype;
 import com.skype.SkypeException;
 
+@Ignore
 final class TestData {
     private static TestCaseProperties data = new TestCaseProperties(TestData.class);
 

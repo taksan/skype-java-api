@@ -21,13 +21,14 @@
  ******************************************************************************/
 package com.skype;
 
-import com.skype.Call;
-import com.skype.CallAdapter;
-import com.skype.Skype;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class CallListenerTest extends TestCase {
+// non automatic test
+@Ignore
+public class CallListenerTest {
+	@Test
     public void testBasic() throws Exception {
         final boolean[] maked = new boolean[1];
         Skype.addCallListener(new CallAdapter() {
@@ -38,7 +39,7 @@ public class CallListenerTest extends TestCase {
             }
         });
         TestUtils.showMessageDialog("Please, make a call to " + TestData.getFriendId() + " and finish.");
-        assertTrue(maked[0]);
+        Assert.assertTrue(maked[0]);
 
         final boolean[] received = new boolean[1];
         Skype.addCallListener(new CallAdapter() {
@@ -49,6 +50,6 @@ public class CallListenerTest extends TestCase {
             }
         });
         TestUtils.showMessageDialog("Please, receive a call from " + TestData.getFriendId() + " and finish.");
-        assertTrue(received[0]);
+        Assert.assertTrue(received[0]);
     }
 }

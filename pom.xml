@@ -3,6 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.skype</groupId>
 	<artifactId>skype-api</artifactId>
+	<name>Skype API</name>
 	<version>1.0-SNAPSHOT</version>
 	<build>
 		<plugins>
@@ -13,6 +14,7 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -56,11 +58,13 @@
 			<name>Java.net Repository for Maven</name>
 			<url>http://download.java.net/maven/2/</url>
 		</repository>
+		<!-- 
 		<repository>
 			<id>mvnrepository.com</id>
 			<name>mvnrepository.com</name>
 			<url>http://mvnrepository.com/artifact/</url>
 		</repository>
+		 -->
 	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

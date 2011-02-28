@@ -38,6 +38,7 @@ public abstract class TestCaseByCSVFile extends TestCase {
     
     @Override
     protected final void runTest() throws Throwable {
+    	TestConnector.resetInstance();
         if (isRecordingMode()) {
             CSVRecorder recorder = null;
             try {
