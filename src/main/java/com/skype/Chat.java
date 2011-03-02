@@ -195,6 +195,9 @@ public final class Chat extends SkypeObject {
             String command = "GET CHAT " + getId() + " CHATMESSAGES";
             String responseHeader = "CHAT " + getId() + " CHATMESSAGES ";
             String response = Connector.getInstance().execute(command, responseHeader);
+            if (response.contains("ERROR")) {
+            	throw new SkypeException("Error when issuing command: " + command + " - " + response);
+            }
             String data = response.substring(responseHeader.length());
             String[] ids = Utils.convertToArray(data);
             ChatMessage[] chatMessages = new ChatMessage[ids.length];

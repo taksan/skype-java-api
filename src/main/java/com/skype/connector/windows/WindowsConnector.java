@@ -25,13 +25,22 @@ package com.skype.connector.windows;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.swt.internal.Callback;
-import org.eclipse.swt.internal.win32.*;
+import org.eclipse.swt.internal.win32.OS;
+import org.eclipse.swt.internal.win32.TCHAR;
+import org.eclipse.swt.internal.win32.WNDCLASS;
 import org.eclipse.swt.widgets.Display;
 
-import com.skype.connector.*;
+import com.skype.connector.AbstractConnectorListener;
+import com.skype.connector.Connector;
+import com.skype.connector.ConnectorException;
+import com.skype.connector.ConnectorListener;
+import com.skype.connector.ConnectorStatusEvent;
 
 /**
  * A connector implementation for Windows based on the SWT libraries.
