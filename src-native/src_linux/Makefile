@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -pipe -g -fPIC 
 #-Wall -W 
 INCPATH = -I. -I$(JDK_DIR)/include -I$(JDK_DIR)/include/linux
-SKYPEFW_SOURCE = SkypeFramework.c Logging.c
+SOURCES = SkypeFramework.c Logging.c
 OBJECTS = $(SOURCES:.c=.o)
 OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 
@@ -32,11 +32,11 @@ com_skype_connector_linux_SkypeFramework.h:
 
 SkypeFramework: com_skype_connector_linux_SkypeFramework.h SkypeFramework.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@.o $@.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $@.c
 
 Logging: com_skype_connector_linux_SkypeFramework.h Logging.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@.o $@.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $@.c
 
 clean:
-	rm -f *.h *.o *.so skypetest
+	rm -f com_skype_connector_linux_SkypeFramework.h *.o *.so skypetest

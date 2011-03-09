@@ -51,7 +51,7 @@ static void log4jInfo(JNIEnv *env, const char * message)
 	jclass clazz  = (*env)->FindClass(env, "org/apache/log4j/Logger");
 
 	printf("logger caught. %p\n", clazz);
-	jmethodID method = (*env)->GetStaticMethodID(env, clazz, "getLogger", "(Ljava/lang/String;)V");
+	jmethodID method = (*env)->GetStaticMethodID(env, clazz, "getLogger", "(Ljava/lang/String;)Lorg/apache/log4j/Logger");
 
 	if (method == NULL) {
 		printf("Could not acquire getLogger method!\n");
