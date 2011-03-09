@@ -20,27 +20,14 @@
  ******************************************************************************/
 package com.skype.sample;
 
-import com.skype.Chat;
-import com.skype.ChatMessage;
 import com.skype.Skype;
 
 public class SendChatMessage {
     public static void main(String[] args) throws Exception {
-//        if (args.length != 2) {
-//            System.out.println("Usage: java com.skype.sample.SendChatMessage 'skype_id' 'chat_message'");
-//            return;
-//        }
-//        Skype.chat("echo123").send("wohoo");
-        Chat[] allRecentChats = Skype.getAllRecentChats();
-        
-        for(Chat chat: allRecentChats) {
-            ChatMessage[] allChatMessages = chat.getAllChatMessages();
-            for(ChatMessage chatMessage: allChatMessages) {
-                System.out.println(chatMessage.getId());
-                System.out.println(chatMessage.getSenderId());
-                System.out.println(chatMessage.getSenderDisplayName());
-                System.out.println(chatMessage.getContent());
-            }
+        if (args.length != 2) {
+            System.out.println("Usage: java com.skype.sample.SendChatMessage 'skype_id' 'chat_message'");
+            return;
         }
+        Skype.chat("echo123").send("wohoo");
     }
 }

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.lang.SystemUtils;
+
 import com.skype.connector.ConnectorUtils;
 import com.skype.connector.LoadLibraryException;
 
@@ -39,7 +41,12 @@ final class SkypeFramework {
     static void init() throws LoadLibraryException {
         synchronized(initializedFieldMutex) {
             if (!initialized) {
-                ConnectorUtils.loadLibrary("skype");  
+            	if (SystemUtils.OS_ARCH.contains("64")) {
+            		ConnectorUtils.loadLibrary("skype_x64");
+            	}
+            	else {
+            		ConnectorUtils.loadLibrary("skype");
+            	}
                 setup0();
                 
                 eventLoopFinishedLatch = new CountDownLatch(1);
