@@ -14,8 +14,7 @@
 
 #define SKYPE_STRING_MAX 0x10000
 
-
-
+static JNIEnv *currentEnv;
 static Display *_display = NULL;
 static int _screen = -1;
 static Window _desktop;
@@ -51,8 +50,8 @@ static Bool checkNull(JNIEnv *env, void *value) {
 
 void setupSkypeFrameWork(JNIEnv *env)
 {
+	currentEnv = env;
 	openLogFile ("skype-framework.log");
-	log4jInfo(env, "info test");
 
 	if (XInitThreads() == 0) {
 		throwInternalError(env, "Xlib don't support multi-threads.");
@@ -160,7 +159,7 @@ Window searchSkypeWindow(Window w)
 					int nProp;
 					Atom * propList = XListProperties(_display, wChild[0], &nProp);
 					if (propList == NULL) {
-						logToFile(LOG_INFO, "Found Skype API Window: 0x%x", (unsigned int)wChild[0]);
+						logToFile(LOG_ERR, "Found Skype API Window: 0x%x", (unsigned int)wChild[0]);
 						return wChild[0];
 					}
 					XFree(propList);
@@ -224,7 +223,7 @@ static void sendCommand(const char *commandChars) {
 		return;
 	}
 
-	logToFile(LOG_INFO, "Sending command to skype: %s", commandChars);
+	logToFile(LOG_DEBUG, "Sending command to skype: %s", commandChars);
 
 	unsigned int position = 0;
 	unsigned int length = strlen(commandChars);
