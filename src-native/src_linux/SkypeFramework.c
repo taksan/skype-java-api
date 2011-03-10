@@ -86,11 +86,21 @@ void setup() {
 }
 
 static void fireNotificationReceived(JNIEnv *env, char *notificationChars) {
+	static int loggerInitialized = 0;
+	static LoggerContext loggerContext;
+	if (!loggerInitialized) {
+		loggerContext = getLoggerContext(env);
+		loggerInitialized = 1;
+	}
+
 	if (notificationChars != NULL) {
-		logToFile(LOG_INFO, "Received skype notification: %s", notificationChars);
+		logDebug(loggerContext, "Received skype notification: %s\0", notificationChars);
 	}
 	else {
-		logToFile(LOG_INFO, "Received a NULL skype notification");
+		printf("fire notification null\n");
+
+		//logToFile(LOG_DEBUG, "Received a NULL skype notification");
+//		logDebug(loggerContext, "Received a NULL skype notification");
 	}
 	jstring notificationString = (*env)->NewStringUTF(env, notificationChars);
 	if (checkNull(env, (void *)notificationString)) {
@@ -100,6 +110,7 @@ static void fireNotificationReceived(JNIEnv *env, char *notificationChars) {
 	jclass clazz  = (*env)->FindClass(env, SKYPE_FRAMEWORK_CLASS);
 	jmethodID method = (*env)->GetStaticMethodID(env, clazz, "fireNotificationReceived", "(Ljava/lang/String;)V");
 	(*env)->CallStaticVoidMethod(env, clazz, method, notificationString);
+
 }
 
 
@@ -185,7 +196,6 @@ Window searchSkypeWindow(Window w)
 	return None;
 }
 
-
 static Window getSkypeWindow() {
 	Atom actualType;
 	int actualFormat;
@@ -218,12 +228,12 @@ JNIEXPORT jboolean JNICALL Java_com_skype_connector_linux_SkypeFramework_isRunni
 	return isRunning()? JNI_TRUE: JNI_FALSE;
 }
 
-static void sendCommand(const char *commandChars) {
+static void sendCommand(JNIEnv *env, const char *commandChars) {
 	if (!isRunning()) {
 		return;
 	}
-
-	logToFile(LOG_DEBUG, "Sending command to skype: %s", commandChars);
+	LoggerContext loggerContext = getLoggerContext(env);
+	logDebug(loggerContext, "Sending command to skype: %s\0", commandChars);
 
 	unsigned int position = 0;
 	unsigned int length = strlen(commandChars);
@@ -252,7 +262,7 @@ static void sendCommand(const char *commandChars) {
 JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_sendCommand0(JNIEnv *env, jclass this, jstring command) {
 	jboolean isCopy;
 	const char *commandChars = (*env)->GetStringUTFChars(env, command, &isCopy);
-	sendCommand(commandChars);
+	sendCommand(env, commandChars);
 	if (isCopy == JNI_TRUE) {
 		(*env)->ReleaseStringUTFChars(env, command, commandChars);
 	}
