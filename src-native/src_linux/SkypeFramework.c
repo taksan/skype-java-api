@@ -51,7 +51,6 @@ static Bool checkNull(JNIEnv *env, void *value) {
 void setupSkypeFrameWork(JNIEnv *env)
 {
 	currentEnv = env;
-	openLogFile ("skype-framework.log");
 
 	if (XInitThreads() == 0) {
 		throwInternalError(env, "Xlib don't support multi-threads.");
@@ -97,10 +96,7 @@ static void fireNotificationReceived(JNIEnv *env, char *notificationChars) {
 		logDebug(loggerContext, "Received skype notification: %s\0", notificationChars);
 	}
 	else {
-		printf("fire notification null\n");
-
-		//logToFile(LOG_DEBUG, "Received a NULL skype notification");
-//		logDebug(loggerContext, "Received a NULL skype notification");
+		logDebug(loggerContext, "Received a NULL skype notification");
 	}
 	jstring notificationString = (*env)->NewStringUTF(env, notificationChars);
 	if (checkNull(env, (void *)notificationString)) {
@@ -130,6 +126,10 @@ JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_runEventLoo
 			if (event.xclient.format != 8)
 				continue;
 
+			if (event.xclient.message_type == _skypeControlApiMessageBeginAtom) {
+				notificationChars[0] = '\0';
+			}
+
 			int i;
 			for (i = 0; i < 20 && event.xclient.data.b[i] != '\0'; i++) {
 				buffer[i] = event.xclient.data.b[i];
@@ -141,6 +141,7 @@ JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_runEventLoo
 				notificationChars[0] = '\0';
 			}
 		}
+		usleep(10);
 	}
 }
 
@@ -170,7 +171,8 @@ Window searchSkypeWindow(Window w)
 					int nProp;
 					Atom * propList = XListProperties(_display, wChild[0], &nProp);
 					if (propList == NULL) {
-						logToFile(LOG_ERR, "Found Skype API Window: 0x%x", (unsigned int)wChild[0]);
+						fprintf(stderr, "Found Skype API Window: 0x%x", (unsigned int)wChild[0]);
+//						logToFile(LOG_ERR, "Found Skype API Window: 0x%x", (unsigned int)wChild[0]);
 						return wChild[0];
 					}
 					XFree(propList);
@@ -192,7 +194,7 @@ Window searchSkypeWindow(Window w)
 		}
 	}
 
-	logToFile(LOG_ERR, "Could not find Skype API Window");
+	fprintf(stderr, "Could not find Skype API Window");
 	return None;
 }
 
