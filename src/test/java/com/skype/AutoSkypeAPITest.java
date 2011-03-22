@@ -21,8 +21,11 @@
  ******************************************************************************/
 package com.skype;
 
+import org.junit.Ignore;
+
 import com.skype.connector.test.TestCaseByCSVFile;
 
+@Ignore
 public class AutoSkypeAPITest extends TestCaseByCSVFile {
     @Override
     protected void setUp() throws Exception {
