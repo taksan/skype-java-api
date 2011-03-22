@@ -194,7 +194,6 @@ Window searchSkypeWindow(Window w)
 		}
 	}
 
-	fprintf(stderr, "Could not find Skype API Window");
 	return None;
 }
 
