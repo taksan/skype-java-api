@@ -28,13 +28,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.swt.carbon</groupId>
-			<artifactId>macosx</artifactId>
-			<version>3.3.0-v3346</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jvnet.winp</groupId>
 			<artifactId>winp</artifactId>
 			<version>1.14</version>
@@ -42,8 +35,17 @@
 		<dependency>
 			<groupId>org.eclipse.swt.win32.win32</groupId>
 			<artifactId>x86</artifactId>
-			<version>3.2.1-v3235</version>
+			<version>3.6.2</version>
 		</dependency>
+		<!--  
+		<dependency>
+			<groupId>org.eclipse.swt.carbon</groupId>
+			<artifactId>macosx</artifactId>
+			<version>3.3.0-v3346</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>		
+		 -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
