@@ -241,6 +241,6 @@ JNIEXPORT jstring JNICALL Java_com_skype_connector_win32_Win32Connector_jni_1get
 		RegCloseKey( hKey );
 	}
 
-	return env->NewString( path, dwBufLen );
+	return env->NewString( (const jchar*)path, dwBufLen );
 
 }
