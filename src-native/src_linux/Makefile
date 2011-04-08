@@ -1,4 +1,4 @@
-JDK_DIR = /usr/lib/jvm/java-6-sun
+JDK_DIR = /usr/lib/jvm/java-6-openjdk/
 
 CC = gcc
 CFLAGS = -pipe -g -fPIC 
@@ -16,10 +16,10 @@ LIBS = -lX11
 
 TARGET=../../src/main/resources/
 
-all: libskype.so libskype_x64.so
+all: libskype_x86.so libskype_x64.so
 
-libskype.so: SkypeFramework Logging
-	$(LINK) $(LFLAGS) -m32 -o $(TARGET)/libskype.so $(OBJECTS) $(LIBS)
+libskype_x86.so: SkypeFramework Logging
+	$(LINK) $(LFLAGS) -m32 -o $(TARGET)/libskype_x86.so $(OBJECTS) $(LIBS)
 
 libskype_x64.so: SkypeFramework Logging
 	$(LINK) $(LFLAGS) -m64 -o $(TARGET)/libskype_x64.so $(OBJECTS_X64) $(LIBS)
