@@ -49,27 +49,8 @@ public abstract class Connector {
 		PENDING_AUTHORIZATION, ATTACHED, REFUSED, NOT_AVAILABLE, API_AVAILABLE, NOT_RUNNING;
 	}
 
-	/**
-	 * useJNIConnector if this is true on windows the connection will be made
-	 * using a dll instead of using swt library.
-	 */
-	private static boolean _useJNIConnector;
 	/** Singleton instance of this class. */
 	private static Connector _instance;
-
-	/**
-	 * To use the win32 dll instead of the SWT library please use this method.
-	 * 
-	 * @param on
-	 *            If true the win32 connector will be used.
-	 */
-	public static synchronized void useJNIConnector(final boolean on) {
-		if (_instance != null) {
-			throw new IllegalStateException(
-					"You should call Connector#useJNIConnector(boolean) before calling Connector#getInstance().");
-		}
-		_useJNIConnector = on;
-	}
 
 	/**
 	 * Initializes a platform specific connection. This method will select a
@@ -83,14 +64,7 @@ public abstract class Connector {
 			String connectorClassName = null;
 			String osName = System.getProperty("os.name");
 			if (osName.startsWith("Windows")) {
-				if (!isSWTAvailable()) {
-					_useJNIConnector = true;
-				}
-				if (_useJNIConnector) {
-					connectorClassName = "com.skype.connector.win32.Win32Connector";
-				} else {
-					connectorClassName = "com.skype.connector.windows.WindowsConnector";
-				}
+				connectorClassName = "com.skype.connector.win32.Win32Connector";
 			} else if (osName.startsWith("Linux") || osName.startsWith("LINUX")) {
 				connectorClassName = "com.skype.connector.linux.LinuxConnector";
 			} else if (osName.startsWith("Mac OS X")) {
@@ -112,20 +86,6 @@ public abstract class Connector {
 			}
 		}
 		return _instance;
-	}
-
-	/**
-	 * Checks if SWT is available in the classpath.
-	 * 
-	 * @return true if SWT is found
-	 */
-	private static boolean isSWTAvailable() {
-		try {
-			Class.forName("org.eclipse.swt.SWT");
-		} catch (ClassNotFoundException e) {
-			return false;
-		}
-		return true;
 	}
 
 	/**

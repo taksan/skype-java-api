@@ -48,7 +48,7 @@ public final class Win32Connector extends Connector {
     /** Status ATTACH_API_AVAILABLE value. */
     private static final int ATTACH_API_AVAILABLE = 0x8001;
     /** Filename of the DLL. */
-    private static final String LIBFILENAME = "skype.dll";
+    private static final String LIB_FILENAME_FORMAT = "skype_%s.dll";
     
     /** Singleton instance. */
     private static Win32Connector instance = null;
@@ -91,13 +91,15 @@ public final class Win32Connector extends Connector {
     	try {
     		System.loadLibrary("skype");
     	} catch (Throwable e) {
-    		if (!ConnectorUtils.checkLibraryInPath(LIBFILENAME)) {
-	    		ConnectorUtils.extractFromJarToTemp(LIBFILENAME);
+    		final String osArch = System.getProperty("os.arch");    		
+    		String libfilename = String.format(LIB_FILENAME_FORMAT, osArch);
+			if (!ConnectorUtils.checkLibraryInPath(libfilename)) {
+	    		ConnectorUtils.extractFromJarToTemp(libfilename);
                 String tmpDir = System.getProperty("java.io.tmpdir");
                 if (! tmpDir.endsWith(""+File.separatorChar)) {
                     tmpDir = tmpDir+File.separatorChar;
                 }
-	    		System.load(tmpDir+LIBFILENAME);
+	    		System.load(tmpDir+libfilename);
 			}
     	}
         // Initializing JNI
