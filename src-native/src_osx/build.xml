@@ -1,0 +1,23 @@
+<project default="build-native-header">
+	<target name="build-native-header" depends="compile">
+		<javah class="com.skype.connector.osx.SkypeFramework" force="yes" classpath="build/classes">
+		</javah>
+	</target>
+
+	<target name="compile">
+		<mkdir dir="build/classes"/>
+		<javac destdir="build/classes">
+			<src path="../../src/main/java"/>
+			<include name="**/LoadLibraryException.java" />
+			<include name="**/ConnectorException.java" />
+			<include name="**/ConnectorUtils.java" />
+			<include name="**/osx/SkypeFrameworkListener.java" />
+			<include name="**/osx/SkypeFramework.java" />
+		</javac>
+	</target>
+
+	<target name="clean">
+		<delete dir="build" />
+		<delete file="com_skype_connector_osx_SkypeFramework.h" />
+	</target>
+</project>

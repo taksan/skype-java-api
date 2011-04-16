@@ -25,6 +25,7 @@ package com.skype.connector;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.apache.commons.lang.UnhandledException;
 
 /**
  * Connector helper class.
@@ -331,10 +334,12 @@ public final class ConnectorUtils {
                     cleanUpOldLibraryFiles(libraryFileName);
                     libraryFile = createTempLibraryFile(libraryFileName);
                 }
+                rehydrateFrameworkAtLibraryPath(libraryFile);
+                
                 try {
                     System.load(libraryFile.getAbsolutePath());            
                 } catch (UnsatisfiedLinkError e) {
-                    throw new LoadLibraryException("Loading " + libraryFileName + " failed.");
+                    throw new LoadLibraryException("Loading " + libraryFileName + " failed.\n"+e.getMessage());
                 }
             }
 
@@ -342,7 +347,31 @@ public final class ConnectorUtils {
         }
     }
 
-    private static void cleanUpOldLibraryFiles(final String libraryFileName) {
+    private static void rehydrateFrameworkAtLibraryPath(File libraryFile) {
+    	try {
+	    	String skypeFrameworkName = "Skype.Framework";
+			File skypeFramework = new File(libraryFile.getCanonicalFile().getParentFile(), skypeFrameworkName);
+	    	InputStream skypeFrameworkStream = ConnectorUtils.class.getResourceAsStream("/"+skypeFrameworkName);
+	    	writeStreamToFile(skypeFrameworkStream, skypeFramework);
+    	}
+    	catch(IOException e) {
+    		throw new UnhandledException(e);
+    	}
+	}
+
+
+	private static void writeStreamToFile(InputStream skypeFrameworkStream,
+			File skypeFramework) throws FileNotFoundException,
+			IOException {
+		FileOutputStream out = new FileOutputStream(skypeFramework);
+		int count;
+		byte[] buffer = new byte[1024];
+		while(0 < (count = skypeFrameworkStream.read(buffer))) {
+		    out.write(buffer, 0, count);
+		}
+	}
+
+	private static void cleanUpOldLibraryFiles(final String libraryFileName) {
         final String fileNamePrefix = libraryFileName.substring(0, libraryFileName.indexOf('.'));
         final String extension = libraryFileName.substring(libraryFileName.lastIndexOf('.'));
         for(File file: new File(System.getProperty("java.io.tmpdir")).listFiles(new FilenameFilter() {
@@ -365,12 +394,8 @@ public final class ConnectorUtils {
             final String extension = libraryFileName.substring(libraryFileName.lastIndexOf('.'));
             File libraryFile = File.createTempFile(fileNamePrefix, extension);
             libraryFile.deleteOnExit();
-            out = new FileOutputStream(libraryFile);
-            int count;
-            byte[] buffer = new byte[1024];
-            while(0 < (count = in.read(buffer))) {
-                out.write(buffer, 0, count);
-            }
+            writeStreamToFile(in, libraryFile);
+            
             return libraryFile;
         } catch(IOException e) {
             throw new LoadLibraryException("Writing " + libraryFileName + " failed.");
