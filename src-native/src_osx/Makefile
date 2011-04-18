@@ -1,5 +1,5 @@
 ARCH=-arch i386 -arch ppc 
-CWD=/Users/uriknaverre/skype-api/src-native/src_osx
+CWD=.
 JNILib=$(CWD)/build/skype.build/Release/JNILib.build
 OBJS_NORMAL=$(JNILib)/Objects-normal/
 DERIVED_SRCS=$(JNILib)/DerivedSources
