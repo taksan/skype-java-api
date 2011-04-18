@@ -910,6 +910,7 @@ public abstract class Connector {
 				ConnectorListener listener = new AbstractConnectorListener() {
 					public void messageReceived(ConnectorMessageEvent event) {
 						String message = event.getMessage();
+						
 						if (responseChecker.isTarget(message)
 								|| message.startsWith("PONG")) {
 							responses.add(message);

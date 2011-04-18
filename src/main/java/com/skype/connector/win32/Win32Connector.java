@@ -91,7 +91,7 @@ public final class Win32Connector extends Connector {
     	try {
     		System.loadLibrary("skype");
     	} catch (Throwable e) {
-    		final String osArch = System.getProperty("os.arch");    		
+    		final String osArch = System.getProperty("os.arch");
     		String libfilename = String.format(LIB_FILENAME_FORMAT, osArch);
 			if (!ConnectorUtils.checkLibraryInPath(libfilename)) {
 	    		ConnectorUtils.extractFromJarToTemp(libfilename);

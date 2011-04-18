@@ -235,10 +235,17 @@ JNIEXPORT jstring JNICALL Java_com_skype_connector_osx_SkypeFramework_sendComman
 
 		return NULL;
 	}
+	if (CFStringHasPrefix(cfResultString, CFSTR("MESSAGE "))) {
+		CFMutableStringRef mutable = CFStringCreateMutable(NULL, 0);
+		CFStringAppend(mutable, CFSTR("CHAT"));
+		CFStringAppend(mutable, cfResultString);
+		cfResultString = mutable;
+	}
 	
 	CFRange range;
 	range.location = 0;
 	range.length = CFStringGetLength(cfResultString);
+
 
 	if (_resultStringBufferLength < range.length) {
 		free(_resultStringBuffer);
@@ -266,6 +273,7 @@ JNIEXPORT jstring JNICALL Java_com_skype_connector_osx_SkypeFramework_sendComman
 	if (isCopy == JNI_TRUE) {
 		(*env)->ReleaseStringUTFChars(env, commandString, ccCommandString);
 	}
+
 	
 	return resultString;
 }

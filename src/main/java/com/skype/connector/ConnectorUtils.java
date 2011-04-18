@@ -348,6 +348,9 @@ public final class ConnectorUtils {
     }
 
     private static void rehydrateFrameworkAtLibraryPath(File libraryFile) {
+    	if (!libraryFile.getName().endsWith("jnilib"))
+    		return;
+    	
     	try {
 	    	String skypeFrameworkName = "Skype.Framework";
 			File skypeFramework = new File(libraryFile.getCanonicalFile().getParentFile(), skypeFrameworkName);
