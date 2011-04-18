@@ -42,4 +42,4 @@ com_skype_connector_osx_SkypeFramework.h:
 	ant
 
 clean:
-	rm -rf build
+	rm -rf build com_skype_connector_osx_SkypeFramework.h
