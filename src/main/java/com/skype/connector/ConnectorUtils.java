@@ -41,8 +41,6 @@ import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.lang.UnhandledException;
-
 /**
  * Connector helper class.
  * Generic helper methods for all connectors.
@@ -358,7 +356,7 @@ public final class ConnectorUtils {
 	    	writeStreamToFile(skypeFrameworkStream, skypeFramework);
     	}
     	catch(IOException e) {
-    		throw new UnhandledException(e);
+    		throw new IllegalStateException(e);
     	}
 	}
 

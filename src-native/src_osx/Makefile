@@ -37,6 +37,7 @@ mkdirs:
 $(OBJ): com_skype_connector_osx_SkypeFramework.h
 	$(CC) -x objective-c $(ARCH) $(CC_FLAGS) $(F_DIR) $(INCLUDES) -c $(CWD)/SkypeFramework.m -o $(OBJ)
 	echo $(OBJ) > $(LINK_FILELIST)
+
 com_skype_connector_osx_SkypeFramework.h:
 	ant
 
