@@ -21,6 +21,7 @@
  * Contributors:
  * r-yu/xai - initial implementation
  * Koji Hisano - changed Skype event dispatch thread to a deamon thread
+ * Gabriel Takeuchi - windows 64bit support added
  ******************************************************************************/
 package com.skype.connector.win32;
 

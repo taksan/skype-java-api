@@ -18,6 +18,7 @@
  * 
  * Contributors:
  * Koji Hisano - initial API and implementation
+ * Gabriel Takeuchi - mac osx native library improvements
  ******************************************************************************/
 package com.skype.connector.osx;
 

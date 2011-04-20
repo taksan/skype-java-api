@@ -18,6 +18,7 @@
  * 
  * Contributors:
  * Koji Hisano - initial API and implementation
+ * Gabriel Takeuchi - small fix under mac for CHATMESSAGE reply
  ******************************************************************************/
 
 #import "com_skype_connector_osx_SkypeFramework.h"

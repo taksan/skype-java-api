@@ -17,6 +17,7 @@
  * in your web site or documents.
  * 
  * Contributors: Koji Hisano - initial API and implementation
+ * Gabriel Takeuchi - Ignored non working tests, fixed some, removed warnings
  ******************************************************************************/
 package com.skype;
 

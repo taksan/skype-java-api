@@ -18,6 +18,7 @@
  * 
  * Contributors:
  * Koji Hisano - initial API and implementation
+ * Gabriel Takeuchi - linux 64 bit support added
  ******************************************************************************/
 package com.skype.connector.linux;
 

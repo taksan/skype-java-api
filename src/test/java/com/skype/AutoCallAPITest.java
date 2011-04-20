@@ -18,6 +18,7 @@
  * 
  * Contributors:
  * Koji Hisano - initial API and implementation
+ * Gabriel Takeuchi - Ignored non working tests, fixed some, removed warnings
  ******************************************************************************/
 package com.skype;
 
@@ -29,16 +30,6 @@ public class AutoCallAPITest extends TestCaseByCSVFile {
     protected void setUp() throws Exception {
         setRecordingMode(false);
     }
-    
-//    public void testConferenceId() throws Exception {
-//        Call call = Skype.call("bitman", "jessy");
-//        String result = call.getConferenceId();
-//        if (isRecordingMode()) {
-//            System.out.println(result);
-//        } else {
-//            assertEquals("11676", result);
-//        }
-//    }
     
     public void testSendDTMF() throws Exception {
         Thread.sleep(2000);

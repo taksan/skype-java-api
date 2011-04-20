@@ -19,6 +19,7 @@
  * Contributors:
  * Koji Hisano - initial API and implementation
  * Bart Lamot - ExtractFormJar methods.
+ * Gabriel Takeuchi - mac osx native library improvements
  ******************************************************************************/
 package com.skype.connector;
 
@@ -350,9 +351,8 @@ public final class ConnectorUtils {
     		return;
     	
     	try {
-	    	String skypeFrameworkName = "Skype.Framework";
-			File skypeFramework = new File(libraryFile.getCanonicalFile().getParentFile(), skypeFrameworkName);
-	    	InputStream skypeFrameworkStream = ConnectorUtils.class.getResourceAsStream("/"+skypeFrameworkName);
+	    	File skypeFramework = new File(libraryFile.getCanonicalFile().getParentFile(), "Skype.Framework");
+	    	InputStream skypeFrameworkStream = ConnectorUtils.class.getResourceAsStream("/"+"Skype.Framework");
 	    	writeStreamToFile(skypeFrameworkStream, skypeFramework);
     	}
     	catch(IOException e) {

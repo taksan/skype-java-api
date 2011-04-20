@@ -18,6 +18,7 @@
  * 
  * Contributors:
  * Koji Hisano - initial API and implementation
+ * Gabriel Takeuchi - retry commands instead of "ping-pong" to improve reliability
  ******************************************************************************/
 package com.skype.connector;
 
@@ -132,11 +133,11 @@ public abstract class Connector {
 	/**
 	 * The connect timeout in milliseconds.
 	 */
-	private volatile int _connectTimeout = 10000;
+	private volatile int _connectTimeout = 20000;
 	/**
 	 * The command reply timeout in milliseconds.
 	 */
-	private volatile int _commandTimeout = 10000;
+	private volatile int _commandTimeout = 20000;
 
 	/**
 	 * The mutex object for the _isInitialized field.
@@ -934,10 +935,7 @@ public abstract class Connector {
 								throw new NotAttachedException(
 										Status.NOT_RUNNING);
 							} else {
-//								fireMessageSent("PING");
-//								sendCommand("PING");
-								
-								// retry instead of playing ping/pong
+								// retry the message again
 								fireMessageSent(command);
 								sendCommand(command);
 								
@@ -945,12 +943,8 @@ public abstract class Connector {
 								continue;
 							}
 						}
-						if (response.startsWith("PONG")) {
-							pinged = false;
-							continue;
-						} else {
-							return response;
-						}
+						
+						return response;
 					}
 				} finally {
 					removeConnectorListener(listener);
