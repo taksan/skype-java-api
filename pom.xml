@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.skype2gmail</groupId>
-	<artifactId>skype4java</artifactId>
+	<groupId>com.github.taksan</groupId>
+	<artifactId>skype-java-api</artifactId>
 	<name>Skype API</name>
 	<version>1.0-SNAPSHOT</version>
-	<url>https://github.com/taksan/Skype-API</url>
+	<url>https://github.com/taksan/skype-java-api</url>
 	<scm>
-		<connection>git://github.com/taksan/Skype-API.git</connection>
-		<url>git://github.com/taksan/Skype-API.git</url>
+		<connection>git://github.com/taksan/skype-java-api.git</connection>
+		<url>git://github.com/taksan/skype-java-api.git</url>
 	</scm>
 	<build>
 		<plugins>
