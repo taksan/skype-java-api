@@ -5,7 +5,7 @@
 	<artifactId>skype4java</artifactId>
 	<name>Skype API</name>
 	<version>1.0-SNAPSHOT</version>
-	<url>git://github.com/taksan/Skype-API.git</url>
+	<url>https://github.com/taksan/Skype-API</url>
 	<scm>
 		<connection>git://github.com/taksan/Skype-API.git</connection>
 		<url>git://github.com/taksan/Skype-API.git</url>
