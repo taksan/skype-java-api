@@ -8,6 +8,7 @@
 	<url>http://taksan.github.com/skype-java-api/</url>
 	<scm>
 		<connection>scm:git:git://github.com/taksan/skype-java-api.git</connection>
+		<developerConnection>scm:git:git://github.com/taksan/skype-java-api.git</developerConnection>
 		<url>git://github.com/taksan/skype-java-api.git</url>
 	</scm>
 	<build>
@@ -88,16 +89,9 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<distributionManagement>
-		<repository>
-			<id>oss.sonatype.org</id>
-			<name>OSS Sonatype Release</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>oss.sonatype.org</id>
-			<name>OSS Sonatype Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
 </project>
