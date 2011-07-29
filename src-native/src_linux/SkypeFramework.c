@@ -108,18 +108,11 @@ void setup() {
 }
 
 static void fireNotificationReceived(JNIEnv *env, char *notificationChars) {
-	static int loggerInitialized = 0;
-	static LoggerContext loggerContext;
-	if (!loggerInitialized) {
-		loggerContext = getLoggerContext(env);
-		loggerInitialized = 1;
-	}
-
 	if (notificationChars != NULL) {
-		logDebug(loggerContext, "Received skype notification: %s\0", notificationChars);
+		logDebug(env, "Received skype notification: %s\0", notificationChars);
 	}
 	else {
-		logDebug(loggerContext, "Received a NULL skype notification");
+		logDebug(env, "Received a NULL skype notification");
 	}
 	jstring notificationString = (*env)->NewStringUTF(env, notificationChars);
 	if (checkNull(env, (void *)notificationString)) {
@@ -129,7 +122,6 @@ static void fireNotificationReceived(JNIEnv *env, char *notificationChars) {
 	jclass clazz  = (*env)->FindClass(env, SKYPE_FRAMEWORK_CLASS);
 	jmethodID method = (*env)->GetStaticMethodID(env, clazz, "fireNotificationReceived", "(Ljava/lang/String;)V");
 	(*env)->CallStaticVoidMethod(env, clazz, method, notificationString);
-
 }
 
 
@@ -194,7 +186,6 @@ Window searchSkypeWindow(Window w)
 					int nProp;
 					Atom * propList = XListProperties(_display, wChild[0], &nProp);
 					if (propList == NULL) {
-						fprintf(stderr, "Found Skype API Window: 0x%x", (unsigned int)wChild[0]);
 //						logToFile(LOG_ERR, "Found Skype API Window: 0x%x", (unsigned int)wChild[0]);
 						return wChild[0];
 					}
@@ -256,8 +247,7 @@ static void sendCommand(JNIEnv *env, const char *commandChars) {
 	if (!isRunning()) {
 		return;
 	}
-	LoggerContext loggerContext = getLoggerContext(env);
-	logDebug(loggerContext, "Sending command to skype: %s\0", commandChars);
+	logDebug(env, "Sending command to skype: %s\0", commandChars);
 
 	unsigned int position = 0;
 	unsigned int length = strlen(commandChars);

@@ -117,6 +117,13 @@ static void SkypeNotificationReceived(CFStringRef aNotificationString){
 		return;
 	}
 
+	if (CFStringHasPrefix(aNotificationString, CFSTR("MESSAGE "))) {
+		CFMutableStringRef mutable = CFStringCreateMutable(NULL, 0);
+		CFStringAppend(mutable, CFSTR("CHAT"));
+		CFStringAppend(mutable, aNotificationString);
+		aNotificationString = mutable;
+	}
+
 	jclass clazz  = (*env)->FindClass(env, SKYPE_FRAMEWORK_CLASS);
 	jfieldID field = (*env)->GetStaticFieldID(env, clazz, "notificationReceivedMutex", "Ljava/lang/Object;");
 	jobject mutex = (*env)->GetStaticObjectField(env, clazz, field);

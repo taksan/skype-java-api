@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -34,14 +35,91 @@
 
 const char * logLevelNames[3] = {"ERROR","INFO","DEBUG"};
 
-static FILE* logfile;
-void openLogFile(const char* logfilename)
+static FILE* logfile = NULL;
+void logToFile(int level, const char* fmt, ...);
+void log4jmessage(LoggerContext * loggerContext, int level, const char * message);
+
+void log4jmessage(LoggerContext * loggerContext, int level, const char * message)
 {
-	logfile = fopen(logfilename, "a+");
+	if (loggerContext == NULL) {
+		logToFile(level, message);
+		return;
+	}
+	jstring messageString = (*loggerContext->env)->NewStringUTF(loggerContext->env, message);
+	jmethodID messageMethod = loggerContext->log4JMethods[level];
+	(*loggerContext->env)->CallVoidMethod(loggerContext->env, loggerContext->logger, messageMethod, messageString);
+	free(loggerContext);
 }
+
+void logInfo(JNIEnv * env, const char * message)
+{
+	LoggerContext * loggerContext = getLoggerContext(env);
+	log4jmessage(loggerContext, LOG_INFO, message);
+
+}
+
+void logError(JNIEnv * env, const char * message)
+{
+	LoggerContext * loggerContext = getLoggerContext(env);
+	log4jmessage(loggerContext, LOG_ERR, message);
+
+}
+
+void logDebug(JNIEnv *env, const char* fmt, ...)
+{
+	LoggerContext *  loggerContext = getLoggerContext(env);
+	
+	va_list ap;
+	va_start(ap, fmt);
+
+	char buffer[200000];
+	vsnprintf(buffer, sizeof(buffer), fmt, ap);
+
+	log4jmessage(loggerContext, LOG_DEBUG, buffer);
+}
+
+LoggerContext * getLoggerContext(JNIEnv *env)
+{
+	return NULL;
+
+	jclass logger = (*env)->FindClass(env, "org/apache/log4j/Logger");
+	if ((*env)->ExceptionCheck(env))
+		return NULL;
+
+	LoggerContext * loggerContext = (LoggerContext*)malloc(sizeof(LoggerContext));
+	loggerContext->env = env;
+
+	loggerContext->log4JClass  = logger;
+	
+	jmethodID method = (*env)->GetStaticMethodID(env, loggerContext->log4JClass, "getLogger", "(Ljava/lang/String;)Lorg/apache/log4j/Logger;");
+
+	if (method == NULL) {
+		free(loggerContext);
+		return NULL;
+	}
+
+	jstring category= (*env)->NewStringUTF(env, LOGGER_CATEGORY);
+	loggerContext->logger = (*env)->CallStaticObjectMethod(env, loggerContext->log4JClass, method, category);
+
+	loggerContext->log4JMethods[LOG_INFO] = (*env)->GetMethodID(env, loggerContext->log4JClass , "info", "(Ljava/lang/Object;)V");
+	loggerContext->log4JMethods[LOG_ERR] = (*env)->GetMethodID(env, loggerContext->log4JClass , "error", "(Ljava/lang/Object;)V");
+	loggerContext->log4JMethods[LOG_DEBUG] = (*env)->GetMethodID(env, loggerContext->log4JClass , "debug", "(Ljava/lang/Object;)V");
+
+	return loggerContext;
+}
+
+void openLogFile(const char* logfilename);
+void logTimeAndLevel(int level);
+void ensureLogFileIsInitialized(); 
 
 void logToFile(int level, const char* fmt, ...)
 {
+	ensureLogFileIsInitialized();
+	if (logfile == NULL)
+		return;
+
+	logTimeAndLevel(level);
+
 	va_list ap;
 	va_start(ap, fmt);
 
@@ -69,71 +147,26 @@ void logTimeAndLevel(int level) {
 	fprintf(logfile, "[%s] [%s]", buffer, logLevelNames[level]);
 }
 
-LoggerContext getLoggerContext(JNIEnv *env)
+void openLogFile(const char* logfilename)
 {
-	LoggerContext loggerContext;
-	loggerContext.env = env;
+	logfile = fopen(logfilename, "a+");
+}
 
-	loggerContext.log4JClass  = (*env)->FindClass(env, "org/apache/log4j/Logger");
-	
-	jmethodID method = (*env)->GetStaticMethodID(env, loggerContext.log4JClass, "getLogger", "(Ljava/lang/String;)Lorg/apache/log4j/Logger;");
+void ensureLogFileIsInitialized() 
+{
+	if (logfile == NULL) {
+		char * debugFileName = getenv("SKYPE_API_NATIVE_DEBUG_FILENAME");
+		if (debugFileName == NULL) {
+			return;
+		}
 
-	if (method == NULL) {
-		fprintf(stderr, "Could not acquire getLogger method!\n");
-		return;
+		if (strcmp(debugFileName, "stdout") == 0) {
+			logfile = stdout;
+		}
+		else {
+			openLogFile(debugFileName);
+		}
+		fprintf(stdout, "Debug initialized. Logging to file: %s\n", debugFileName);
 	}
-
-	jstring category= (*env)->NewStringUTF(env, LOGGER_CATEGORY);
-	loggerContext.logger = (*env)->CallStaticObjectMethod(env, loggerContext.log4JClass, method, category);
-
-	loggerContext.log4JInfoMethod  = (*env)->GetMethodID(env, loggerContext.log4JClass , "info", "(Ljava/lang/Object;)V");
-	loggerContext.log4JErrorMethod = (*env)->GetMethodID(env, loggerContext.log4JClass , "error", "(Ljava/lang/Object;)V");
-	loggerContext.log4JDebugMethod = (*env)->GetMethodID(env, loggerContext.log4JClass , "debug", "(Ljava/lang/Object;)V");
-
-	return loggerContext;
-}
-
-void log4jmessage(LoggerContext loggerContext, jmethodID messageMethod, const char * message)
-{
-/*
-	va_list ap;
-	va_start(ap, fmt);
-	char messageBuffer[3000];
-
-	printf("will do a printf\n")
-	vprintf(fmt,ap);
-
-	printf("will print into a string \n")
-
-	vsprintf(messageBuffer, fmt, ap);
-//	logToFile(LOG_DEBUG, messageBuffer);
-	printf("will invoke log4j\n")
-	*/
-
-	jstring messageString = (*loggerContext.env)->NewStringUTF(loggerContext.env, message);
-	(*loggerContext.env)->CallVoidMethod(loggerContext.env, loggerContext.logger, messageMethod, messageString);
-}
-
-void logInfo(LoggerContext loggerContext, const char * message)
-{
-	log4jmessage(loggerContext, loggerContext.log4JInfoMethod, message);
-
-}
-
-void logError(LoggerContext loggerContext, const char * message)
-{
-	log4jmessage(loggerContext, loggerContext.log4JErrorMethod, message);
-
-}
-
-void logDebug(LoggerContext loggerContext, const char* fmt, ...)
-{
-	va_list ap;
-	va_start(ap, fmt);
-
-	char buffer[200000];
-	vsnprintf(buffer, sizeof(buffer), fmt, ap);
-
-	log4jmessage(loggerContext, loggerContext.log4JDebugMethod, buffer);
 }
 

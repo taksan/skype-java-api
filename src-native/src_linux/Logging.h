@@ -33,20 +33,18 @@ typedef struct  {
 	JNIEnv *env;
 	jclass log4JClass;
 	jobject logger;	
-	jmethodID log4JInfoMethod;
-	jmethodID log4JErrorMethod;
-	jmethodID log4JDebugMethod;
+	jmethodID log4JMethods[3];
 
 } LoggerContext;
 
-LoggerContext getLoggerContext(JNIEnv *env);
+LoggerContext * getLoggerContext(JNIEnv *env);
 
 
 void openLogFile(const char* logfilename);
 void logToFile(int level, const char* fmt, ...);
 
-void logInfo(LoggerContext loggerContext, const char * message);
-void logError(LoggerContext loggerContext, const char * message);
-void logDebug(LoggerContext loggerContext, const char* fmt, ...);
+void logInfo(JNIEnv * env, const char * message);
+void logError(JNIEnv * env, const char * message);
+void logDebug(JNIEnv * env, const char* fmt, ...);
 
 #endif
