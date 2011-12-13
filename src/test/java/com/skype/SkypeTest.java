@@ -2,6 +2,7 @@ package com.skype;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Test;
 
 import com.skype.mocks.ConnectorMock;
@@ -10,7 +11,7 @@ public class SkypeTest {
 	@Test
 	public void addListener_ShouldNotAddListenerIfExceptionIsThrown() throws SkypeException
 	{
-		Skype.setConnectorInstance(new ConnectorMock());
+		Skype.setReplacementConnectorInstance(new ConnectorMock());
 		
 		CallListener mockListener = createMockListener();
 		
@@ -33,5 +34,10 @@ public class SkypeTest {
 			public void callMaked(Call makedCall) throws SkypeException {
 			}
 		};
+	}
+	
+	@After
+	public void tearDown() {
+		Skype.setReplacementConnectorInstance(null);
 	}
 }

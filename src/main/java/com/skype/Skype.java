@@ -1026,15 +1026,15 @@ public final class Skype {
         exceptionHandler.uncaughtExceptionHappened(e);
     }
     
-    static void setConnectorInstance(Connector connector) {
-    	connectorInstance = connector;
+    static void setReplacementConnectorInstance(Connector connector) {
+    	replacementConnectorInstance = connector;
     }
 
-    static Connector connectorInstance = null;
+    static Connector replacementConnectorInstance = null;
 	private static Connector getConnectorInstance() {
-		if (connectorInstance == null)
-			connectorInstance = Connector.getInstance();
-		return connectorInstance;
+		if (replacementConnectorInstance == null)
+			return Connector.getInstance();
+		return replacementConnectorInstance;
 	}    
 
     /** 
