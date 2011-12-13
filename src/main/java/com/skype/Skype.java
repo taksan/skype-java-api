@@ -35,7 +35,68 @@ import com.skype.connector.*;
  * @author Koji Hisano
  */
 public final class Skype {
-    /**
+    private static final class ConnectorListenerImpl extends
+			AbstractConnectorListener {
+		public void messageReceived(ConnectorMessageEvent event) {
+			String message = event.getMessage();
+			if (message.startsWith("CALL ")) {
+				String data = message.substring("CALL ".length());
+				String id = data.substring(0, data.indexOf(' '));
+				String propertyNameAndValue = data
+						.substring(data.indexOf(' ') + 1);
+				String propertyName = propertyNameAndValue.substring(0,
+						propertyNameAndValue.indexOf(' '));
+				if ("STATUS".equals(propertyName)) {
+					String propertyValue = propertyNameAndValue
+							.substring(propertyNameAndValue.indexOf(' ') + 1);
+					Call.Status status = Call.Status.valueOf(propertyValue);
+					Call call = Call.getInstance(id);
+					EXIT: if (status == Call.Status.ROUTING || status == Call.Status.RINGING) {
+						synchronized (call) {
+							if (call.isCallListenerEventFired()) {
+								break EXIT;
+							}
+							call.setCallListenerEventFired(true);
+							CallListener[] listeners = callListeners
+									.toArray(new CallListener[0]);
+							try {
+								switch (call.getType()) {
+								case OUTGOING_P2P:
+								case OUTGOING_PSTN:
+									for (CallListener listener : listeners) {
+										try {
+											listener.callMaked(call);
+										} catch (Throwable e) {
+											handleUncaughtException(e);
+										}
+									}
+									break;
+								case INCOMING_P2P:
+								case INCOMING_PSTN:
+									for (CallListener listener : listeners) {
+										try {
+											listener.callReceived(call);
+										} catch (Throwable e) {
+											handleUncaughtException(e);
+										}
+									}
+									break;
+								default:
+									// Should an exception be thrown?
+									break;
+								}
+							} catch (Throwable e) {
+								handleUncaughtException(e);
+							}
+						}
+					}
+					call.fireStatusChanged(status);
+				}
+			}
+		}
+	}
+
+	/**
      * The library version.
      */
     public static final String LIBRARY_VERSION = "1.0.0.0";
@@ -124,7 +185,7 @@ public final class Skype {
      */
     public static void setDebug(boolean on) throws SkypeException {
         try {
-            Connector.getInstance().setDebug(on);
+            getConnectorInstance().setDebug(on);
         } catch (ConnectorException e) {
             Utils.convertToSkypeException(e);
         }
@@ -158,7 +219,7 @@ public final class Skype {
      * @return String with the full path to Skype client.
      */
     public static String getInstalledPath() {
-        return Connector.getInstance().getInstalledPath();
+        return getConnectorInstance().getInstalledPath();
     }
 
     /**
@@ -169,7 +230,7 @@ public final class Skype {
      */
     public static boolean isRunning() throws SkypeException {
         try {
-            return Connector.getInstance().isRunning();
+            return getConnectorInstance().isRunning();
         } catch (ConnectorException e) {
             Utils.convertToSkypeException(e);
             return false;
@@ -187,7 +248,7 @@ public final class Skype {
         String responseHeader = "USERS ";
         String response;
         try {
-            response = Connector.getInstance().executeWithId(command, responseHeader);
+            response = getConnectorInstance().executeWithId(command, responseHeader);
         } catch(ConnectorException ex) {
             Utils.convertToSkypeException(ex);
             return null;
@@ -237,7 +298,7 @@ public final class Skype {
         Utils.checkNotNull("skypeIds", skypeId);
         try {
             String responseHeader = "CALL ";
-            String response = Connector.getInstance().executeWithId("CALL " + skypeId, responseHeader);
+            String response = getConnectorInstance().executeWithId("CALL " + skypeId, responseHeader);
             Utils.checkError(response);
             String id = response.substring(responseHeader.length(), response.indexOf(" STATUS "));
             return Call.getInstance(id);
@@ -269,7 +330,7 @@ public final class Skype {
     public static Chat chat(String skypeId) throws SkypeException {
         try {
             String responseHeader = "CHAT ";
-            String response = Connector.getInstance().executeWithId("CHAT CREATE " + skypeId, responseHeader);
+            String response = getConnectorInstance().executeWithId("CHAT CREATE " + skypeId, responseHeader);
             Utils.checkError(response);
             String id = response.substring(responseHeader.length(), response.indexOf(" STATUS "));
             return Chat.getInstance(id);
@@ -385,7 +446,7 @@ public final class Skype {
     private static SMS createSMS(String number, SMS.Type type) throws SkypeException {
         try {
             String responseHeader = "SMS ";
-            String response = Connector.getInstance().executeWithId("CREATE SMS " + type + " " + number, responseHeader);
+            String response = getConnectorInstance().executeWithId("CREATE SMS " + type + " " + number, responseHeader);
             Utils.checkError(response);
             String id = response.substring(responseHeader.length(), response.indexOf(" STATUS "));
             return SMS.getInstance(id);
@@ -423,7 +484,7 @@ public final class Skype {
         try {
             String command = "SEARCH " + type;
             String responseHeader = "SMSS ";
-            String response = Connector.getInstance().execute(command, responseHeader);
+            String response = getConnectorInstance().execute(command, responseHeader);
             String data = response.substring(responseHeader.length());
             String[] ids = Utils.convertToArray(data);
             SMS[] smss = new SMS[ids.length];
@@ -446,7 +507,7 @@ public final class Skype {
     public static VoiceMail voiceMail(String skypeId) throws SkypeException {
         try {
             String responseHeader = "VOICEMAIL ";
-            String response = Connector.getInstance().executeWithId("VOICEMAIL " + skypeId, responseHeader);
+            String response = getConnectorInstance().executeWithId("VOICEMAIL " + skypeId, responseHeader);
             Utils.checkError(response);
             String id = response.substring(responseHeader.length(), response.indexOf(' ', responseHeader.length()));
             return VoiceMail.getInstance(id);
@@ -465,7 +526,7 @@ public final class Skype {
         try {
             String command = "SEARCH VOICEMAILS";
             String responseHeader = "VOICEMAILS ";
-            String response = Connector.getInstance().execute(command, responseHeader);
+            String response = getConnectorInstance().execute(command, responseHeader);
             String data = response.substring(responseHeader.length());
             String[] ids = Utils.convertToArray(data);
             VoiceMail[] voiceMails = new VoiceMail[ids.length];
@@ -614,7 +675,7 @@ public final class Skype {
         try {
             String command = "SEARCH ACTIVECALLS";
             String responseHeader = "CALLS ";
-            String response = Connector.getInstance().execute(command, responseHeader);
+            String response = getConnectorInstance().execute(command, responseHeader);
             String data = response.substring(responseHeader.length());
             String[] ids = Utils.convertToArray(data);
             Call[] calls = new Call[ids.length];
@@ -694,7 +755,7 @@ public final class Skype {
         try {
             String command = "SEARCH " + type;
             String responseHeader = "CHATS ";
-            String response = Connector.getInstance().execute(command, responseHeader);
+            String response = getConnectorInstance().execute(command, responseHeader);
             String data = response.substring(responseHeader.length());
             String[] ids = Utils.convertToArray(data);
             Chat[] chats = new Chat[ids.length];
@@ -789,7 +850,7 @@ public final class Skype {
                     }
                 };
                 try {
-                    Connector.getInstance().addConnectorListener(chatMessageListener);
+                    getConnectorInstance().addConnectorListener(chatMessageListener);
                 } catch (ConnectorException e) {
                     Utils.convertToSkypeException(e);
                 }
@@ -808,7 +869,7 @@ public final class Skype {
         synchronized (chatMessageListenerMutex) {
             chatMessageListeners.remove(listener);
             if (chatMessageListeners.isEmpty()) {
-                Connector.getInstance().removeConnectorListener(chatMessageListener);
+                getConnectorInstance().removeConnectorListener(chatMessageListener);
                 chatMessageListener = null;
             }
         }
@@ -823,70 +884,30 @@ public final class Skype {
     public static void addCallListener(CallListener listener) throws SkypeException {
         Utils.checkNotNull("listener", listener);
         synchronized (callListenerMutex) {
-            callListeners.add(listener);
-            if (callListener == null) {
-                callListener = new AbstractConnectorListener() {
-                    public void messageReceived(ConnectorMessageEvent event) {
-                        String message = event.getMessage();
-                        if (message.startsWith("CALL ")) {
-                            String data = message.substring("CALL ".length());
-                            String id = data.substring(0, data.indexOf(' '));
-                            String propertyNameAndValue = data.substring(data.indexOf(' ') + 1);
-                            String propertyName = propertyNameAndValue.substring(0, propertyNameAndValue.indexOf(' '));
-                            if ("STATUS".equals(propertyName)) {
-                                String propertyValue = propertyNameAndValue.substring(propertyNameAndValue.indexOf(' ') + 1);
-                                Call.Status status = Call.Status.valueOf(propertyValue);
-                                Call call = Call.getInstance(id);
-                                EXIT: if (status == Call.Status.ROUTING || status == Call.Status.RINGING) {
-                                    synchronized(call) {
-                                        if (call.isCallListenerEventFired()) {
-                                            break EXIT;
-                                        }
-                                        call.setCallListenerEventFired(true);
-                                        CallListener[] listeners = callListeners.toArray(new CallListener[0]);
-                                        try {
-                                            switch (call.getType()) {
-                                                case OUTGOING_P2P:
-                                                case OUTGOING_PSTN:
-                                                    for (CallListener listener : listeners) {
-                                                        try {
-                                                            listener.callMaked(call);
-                                                        } catch (Throwable e) {
-                                                            handleUncaughtException(e);
-                                                        }
-                                                    }
-                                                    break;
-                                                case INCOMING_P2P:
-                                                case INCOMING_PSTN:
-                                                    for (CallListener listener : listeners) {
-                                                        try {
-                                                            listener.callReceived(call);
-                                                        } catch (Throwable e) {
-                                                            handleUncaughtException(e);
-                                                        }
-                                                    }
-                                                    break;
-                                                default: 
-                                                	//Should an exception be thrown?
-                                                	break;
-                                            }
-                                        } catch (Throwable e) {
-                                            handleUncaughtException(e);
-                                        }
-                                    }
-                                }
-                                call.fireStatusChanged(status);
-                            }
-                        }
-                    }
-                };
-                try {
-                    Connector.getInstance().addConnectorListener(callListener);
-                } catch (ConnectorException e) {
-                    Utils.convertToSkypeException(e);
-                }
-            }
+        	boolean success = false;
+        	try {
+	            callListeners.add(listener);
+	            if (callListener == null) {
+	                callListener = new ConnectorListenerImpl();
+	                try {
+	                    getConnectorInstance().addConnectorListener(callListener);
+	                } catch (ConnectorException e) {
+	                    Utils.convertToSkypeException(e);
+	                }
+	            }
+	            success = true;
+        	}
+        	finally {
+        		if (!success) {
+        			callListeners.remove(listener);
+        		}
+        	}
+        	
         }
+    }
+    
+    public static boolean isCallListenerRegistered(CallListener listener) {
+    	return callListeners.contains(listener);
     }
 
     /**
@@ -900,7 +921,7 @@ public final class Skype {
             callListeners.remove(listener);
             if (callListeners.isEmpty()) {
             	if (callListener != null)
-            		Connector.getInstance().removeConnectorListener(callListener);
+            		getConnectorInstance().removeConnectorListener(callListener);
                 callListener = null;
             }
         }
@@ -961,7 +982,7 @@ public final class Skype {
                     }
                 };
                 try {
-                    Connector.getInstance().addConnectorListener(voiceMailListener);
+                    getConnectorInstance().addConnectorListener(voiceMailListener);
                 } catch (ConnectorException e) {
                     Utils.convertToSkypeException(e);
                 }
@@ -979,7 +1000,7 @@ public final class Skype {
         synchronized (voiceMailListenerMutex) {
             voiceMailListeners.remove(listener);
             if (voiceMailListeners.isEmpty()) {
-                Connector.getInstance().removeConnectorListener(voiceMailListener);
+                getConnectorInstance().removeConnectorListener(voiceMailListener);
                 voiceMailListener = null;
             }
         }
@@ -1004,6 +1025,17 @@ public final class Skype {
     static void handleUncaughtException(Throwable e) {
         exceptionHandler.uncaughtExceptionHappened(e);
     }
+    
+    static void setConnectorInstance(Connector connector) {
+    	connectorInstance = connector;
+    }
+
+    static Connector connectorInstance = null;
+	private static Connector getConnectorInstance() {
+		if (connectorInstance == null)
+			connectorInstance = Connector.getInstance();
+		return connectorInstance;
+	}    
 
     /** 
      * Private constructor.
