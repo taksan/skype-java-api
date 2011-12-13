@@ -18,6 +18,9 @@
  * Contributors:
  * r-yu/xai - initial implementation
  ******************************************************************************/
+
+#pragma comment(lib,"user32.lib");
+#pragma comment(lib,"Advapi32.lib")
 #include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
