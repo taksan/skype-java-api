@@ -899,7 +899,8 @@ public final class Skype {
         synchronized (callListenerMutex) {
             callListeners.remove(listener);
             if (callListeners.isEmpty()) {
-                Connector.getInstance().removeConnectorListener(callListener);
+            	if (callListener != null)
+            		Connector.getInstance().removeConnectorListener(callListener);
                 callListener = null;
             }
         }

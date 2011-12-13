@@ -70,7 +70,7 @@ public final class ConnectorUtils {
 	 * @return true if file could be found and extracted.
 	 */
 	public static boolean extractFromJarToTemp(String filename) {
-        return extractFromJar(filename, filename, System.getProperty("java.io.tmpdir"));
+		return extractFromJar(filename, filename, getTempDir());
 	}
 	
 	/**
@@ -420,4 +420,18 @@ public final class ConnectorUtils {
 	 */
     private ConnectorUtils() {
     }
+
+
+	public static String getTempDir() {
+		File directory = new File(System.getProperty("java.io.tmpdir"));
+		File tempDir;
+		try {
+			tempDir = File.createTempFile("skype-java-api", "", directory);
+			tempDir.delete();
+			tempDir.mkdir();
+			return tempDir.getCanonicalPath();
+		} catch (IOException e) {
+			throw new RuntimeException("Could not create temporary directory to extract required libraries", e);
+		}
+	}
 }
