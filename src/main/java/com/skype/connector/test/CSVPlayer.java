@@ -46,7 +46,7 @@ public final class CSVPlayer extends Player {
         if (reader != null) {
             destory();
         }
-            InputStream csvStream = getClass().getResourceAsStream(file.getAbsolutePath());
+            InputStream csvStream = getClass().getResourceAsStream(file.getPath().replace("\\","/"));
             if (csvStream == null)
             	throw new IllegalStateException("The CSV file "+file.getAbsolutePath()+" was not found.");
 			reader = new BufferedReader(new InputStreamReader(csvStream));
