@@ -37,7 +37,7 @@ import com.skype.connector.ConnectorUtils;
  * The WindowsConnector uses SWT library.
  * Choose wisely.
  */
-public final class Win32Connector extends Connector {
+public class Win32Connector extends Connector {
     /** Status ATTACH_SUCCES value. */
 	private static final int ATTACH_SUCCESS = 0;
 	/** Status ATTACH_PENDING_AUTHORISATION value. */
@@ -72,7 +72,7 @@ public final class Win32Connector extends Connector {
      * Constructor.
      *
      */
-    private Win32Connector() {
+    protected Win32Connector() {
     }
 
     /**
@@ -96,7 +96,7 @@ public final class Win32Connector extends Connector {
     		String libfilename = String.format(LIB_FILENAME_FORMAT, osArch);
 			if (!ConnectorUtils.checkLibraryInPath(libfilename)) {
 	    		ConnectorUtils.extractFromJarToTemp(libfilename);
-                String tmpDir = System.getProperty("java.io.tmpdir");
+                String tmpDir = ConnectorUtils.getSkypeTempDir();
                 if (! tmpDir.endsWith(""+File.separatorChar)) {
                     tmpDir = tmpDir+File.separatorChar;
                 }

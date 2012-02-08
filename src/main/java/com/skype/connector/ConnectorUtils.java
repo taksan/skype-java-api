@@ -70,7 +70,7 @@ public final class ConnectorUtils {
 	 * @return true if file could be found and extracted.
 	 */
 	public static boolean extractFromJarToTemp(String filename) {
-		return extractFromJar(filename, filename, getTempDir());
+		return extractFromJar(filename, filename, getSkypeTempDir());
 	}
 	
 	/**
@@ -422,14 +422,22 @@ public final class ConnectorUtils {
     }
 
 
-	public static String getTempDir() {
+    private static String skypeApiTempDir = null;
+	public static String getSkypeTempDir() {
+		if (skypeApiTempDir != null) {
+			if (new File(skypeApiTempDir).exists())
+				return skypeApiTempDir;
+		}
+		
+		
 		File directory = new File(System.getProperty("java.io.tmpdir"));
 		File tempDir;
 		try {
 			tempDir = File.createTempFile("skype-java-api", "", directory);
 			tempDir.delete();
 			tempDir.mkdir();
-			return tempDir.getCanonicalPath();
+			skypeApiTempDir =  tempDir.getCanonicalPath();
+			return skypeApiTempDir;
 		} catch (IOException e) {
 			throw new RuntimeException("Could not create temporary directory to extract required libraries", e);
 		}
