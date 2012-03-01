@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -159,14 +158,11 @@ public final class ConnectorUtils {
      * @param destinationDirectory The directory to place it in.
      * @return true if file could be found and extracted.
      */
-    @SuppressWarnings("rawtypes")
 	private static boolean extractFromJarUsingClassLoader(String searchString, String filename, String destinationDirectory) {
         ClassLoader cl = null;
         try {
-            Class clClass = Class.forName("com.simontuffs.onejar.JarClassLoader");
-            Constructor[] constructor = clClass.getConstructors();
-            cl = (ClassLoader) constructor[1].newInstance(ClassLoader.getSystemClassLoader());
-            System.out.println("Loaded JarClassLoader. cl="+cl.toString());
+        	cl = ConnectorUtils.class.getClassLoader();
+//            System.out.println("Loaded JarClassLoader. cl="+cl.toString());
         } catch (Throwable e) {
             cl = ClassLoader.getSystemClassLoader();
         }
