@@ -124,6 +124,7 @@ public class Win32Connector extends Connector {
      */
     protected Status connect(int timeout) throws ConnectorException {
         try {
+        	int retries = 3;
             while(true) {
                 jni_connect();
                 long start = System.currentTimeMillis();
@@ -134,6 +135,10 @@ public class Win32Connector extends Connector {
                 if(status != Status.PENDING_AUTHORIZATION && status != Status.NOT_RUNNING) {
                     return status;
                 }
+                if (retries <= 0)
+                	return Status.NOT_RUNNING;
+                	
+                retries--;
                 Thread.sleep(1000);
             }
         } catch(InterruptedException e) {
