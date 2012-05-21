@@ -47,7 +47,7 @@ libskype_x64.so: SkypeFramework Logging
 	$(LINK) $(LFLAGS) -m64 -o $(TARGET)/libskype_x64.so $(OBJECTS_X64) $(LIBS)
 
 skypetest: SkypeFramework.o skypetest.cpp
-	$(LINK) -o skypetest $(CFLAGS) $(LFLAGS) -lX11 $(OBJECTS_X64) skypetest.cpp
+	$(LINK) -o skypetest  $(OBJECTS_X64) skypetest.cpp -L/usr/lib/x86_64-linux-gnu/ -lX11
 
 com_skype_connector_linux_SkypeFramework.h:
 	javah -classpath ../../target/classes com.skype.connector.linux.SkypeFramework
