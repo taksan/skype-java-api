@@ -33,12 +33,12 @@ OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 .SECONDEXPANSION:
 
 LINK = g++
-LFLAGS = -shared -L/usr/X11R6/lib
+LFLAGS = -shared -L/usr/lib/x86_64-linux-gnu/
 LIBS = -lX11
 
 TARGET=../../src/main/resources/
 
-all: libskype_x86.so libskype_x64.so
+all:  libskype_x64.so
 
 libskype_x86.so: SkypeFramework Logging
 	$(LINK) $(LFLAGS) -m32 -o $(TARGET)/libskype_x86.so $(OBJECTS) $(LIBS)
@@ -47,7 +47,7 @@ libskype_x64.so: SkypeFramework Logging
 	$(LINK) $(LFLAGS) -m64 -o $(TARGET)/libskype_x64.so $(OBJECTS_X64) $(LIBS)
 
 skypetest: SkypeFramework.o skypetest.cpp
-	$(LINK) -o skypetest -L/usr/X11R6/lib -lX11 $(OBJECTS_X64) skypetest.cpp
+	$(LINK) -o skypetest $(CFLAGS) $(LFLAGS) -lX11 $(OBJECTS_X64) skypetest.cpp
 
 com_skype_connector_linux_SkypeFramework.h:
 	javah -classpath ../../target/classes com.skype.connector.linux.SkypeFramework
