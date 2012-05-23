@@ -302,6 +302,10 @@ JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_closeDispla
 	}
 }
 
+void * runLoop(void * args){
+	Java_com_skype_connector_linux_SkypeFramework_runEventLoop0(NULL, NULL);
+}
+
 int aisRunning(){
 	return isRunning();
 }
