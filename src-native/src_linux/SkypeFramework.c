@@ -131,8 +131,9 @@ JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_runEventLoo
 	char *notificationChars = (char *)malloc(sizeof(char) * SKYPE_STRING_MAX);
 	notificationChars[0] = '\0';
 
+	Display *display = XOpenDisplay(NULL);
 	while(True) {
-		XNextEvent(_display, &event);
+		XNextEvent(display, &event);
 		if (event.type == ClientMessage) {
 			if (event.xclient.message_type == _stopEventLoopAtom) {
 				break;
