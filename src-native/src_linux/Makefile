@@ -38,10 +38,10 @@ LIBS = -lX11
 
 TARGET=../../src/main/resources/
 
-all:  libskype_x64.so
+all: libskype_x86.so libskype_x64.so
 
 libskype_x86.so: SkypeFramework Logging
-	$(LINK) $(LFLAGS) -m32 -o $(TARGET)/libskype_x86.so $(OBJECTS) $(LIBS)
+	$(LINK) -shared  -m32 -o $(TARGET)/libskype_x86.so $(OBJECTS) $(LIBS) -L/usr/lib/i386-linux-gnu
 
 libskype_x64.so: SkypeFramework Logging
 	$(LINK) $(LFLAGS) -m64 -o $(TARGET)/libskype_x64.so $(OBJECTS_X64) $(LIBS)
