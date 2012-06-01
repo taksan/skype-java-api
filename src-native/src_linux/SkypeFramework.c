@@ -37,6 +37,8 @@
 
 #define SKYPE_STRING_MAX 0x10000
 
+static Window getSkypeWindow();
+
 static JNIEnv *currentEnv;
 static Display *_display = NULL;
 static int _screen = -1;
@@ -97,6 +99,7 @@ void setupSkypeFrameWork(JNIEnv *env)
 	_windowNameAtom = XInternAtom(_display, "WM_NAME", True);
 	
 	_dispatching = True;
+	getSkypeWindow();
 }
 
 JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_setup0(JNIEnv *env, jclass this) {
@@ -131,9 +134,8 @@ JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_runEventLoo
 	char *notificationChars = (char *)malloc(sizeof(char) * SKYPE_STRING_MAX);
 	notificationChars[0] = '\0';
 
-	Display *display = XOpenDisplay(NULL);
 	while(True) {
-		XNextEvent(display, &event);
+		XNextEvent(_display, &event);
 		if (event.type == ClientMessage) {
 			if (event.xclient.message_type == _stopEventLoopAtom) {
 				break;
