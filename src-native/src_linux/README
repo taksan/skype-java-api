@@ -1,0 +1,2 @@
+To make the libraries, you must have xorg-dev installed (which should install libX11)
+Also, in a 64bit system, you must have ia32-libs.

@@ -1,12 +1,16 @@
 This project is a mavenization and release of Skype4Java with some bug fixes.
 
+There are some usage samples in the following project:
+
+https://github.com/taksan/skype-api-samples
+
 The main idea is to use as a maven dependency, since it is deployed on maven central. To use it,
 just add the following to your pom.xml dependencies:
 
 <dependency>
 	  <groupId>com.github.taksan</groupId>
 	  <artifactId>skype-java-api</artifactId>
-	  <version>1.1</version>
+	  <version>1.2</version>
 </dependency>
 
 I'll make a shade jar release as well, which will make it possible to use it as a standalone version,
