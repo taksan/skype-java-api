@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<node>
+  <interface name="com.Skype.API.Client">
+    <method name="Notify">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="skype_service_notify_callback"/>
+      <arg type="s" name="message" direction="in"/>
+    </method>
+  </interface>
+</node>
+
+

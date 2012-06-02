@@ -43,7 +43,7 @@ final class SkypeFramework {
         synchronized(initializedFieldMutex) {
             if (!initialized) {
             	if (SystemUtils.OS_ARCH.contains("64")) {
-            		ConnectorUtils.loadLibrary("skype_x64");
+            		ConnectorUtils.loadLibrary(getLibName("x64"));
             	}
             	else {
             		ConnectorUtils.loadLibrary("skype_x86");
@@ -63,6 +63,12 @@ final class SkypeFramework {
             }
         }
     }
+
+	private static String getLibName(String arch) {
+		if (System.getProperty("skype.api.impl.dbus")!=null)
+			return "skype_dbus_"+arch;
+		return "skype_"+arch;
+	}
     
     private static native void setup0();
     private static native void runEventLoop0();
