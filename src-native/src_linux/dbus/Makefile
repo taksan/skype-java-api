@@ -23,10 +23,11 @@
 JDK_DIR = /usr/lib/jvm/java-6-openjdk/
 
 CC = gcc
-CFLAGS = -Wall -pipe -g -fPIC $(shell pkg-config --cflags dbus-1 dbus-glib-1 )
+CFLAGS = -Wall -pipe -g -fPIC -I../commons $(shell pkg-config --cflags dbus-1 dbus-glib-1 )
 #-Wall -W 
 INCPATH = -I. -I$(JDK_DIR)/include -I$(JDK_DIR)/include/linux
-SOURCES = SkypeFramework.c Logging.c SkypeService.c
+LOGGING=../commons/Logging.c
+SOURCES = SkypeFramework.c SkypeService.c Logging.c
 OBJECTS = $(SOURCES:.c=.o)
 OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 
@@ -61,9 +62,9 @@ SkypeFramework: com_skype_connector_linux_SkypeFramework.h SkypeFramework.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $@.c
 
-Logging: com_skype_connector_linux_SkypeFramework.h Logging.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $@.c
+Logging: com_skype_connector_linux_SkypeFramework.h $(LOGGING)
+	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $(LOGGING)
+	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $(LOGGING)
 
 SkypeService: skype-service.h skype-service-object-glue.h SkypeService.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
