@@ -2,3 +2,4 @@ target
 target/*
 .*.swp
 build
+*.o
