@@ -166,7 +166,8 @@ void ensureLogFileIsInitialized()
 		else {
 			openLogFile(debugFileName);
 		}
-		fprintf(stdout, "Debug initialized. Logging to file: %s\n", debugFileName);
+		fprintf(stdout, "Linux Native Lib Debug initialized. Logging to file: %s\n", debugFileName);
+		fflush(stdout);
 	}
 }
 

@@ -40,18 +40,16 @@ static DBusGProxy *proxy_send = NULL;
 static SkypeService *service_object = NULL;
 
 static void throwInternalError(JNIEnv *env, char *message);
-static gboolean checkNull(JNIEnv *env, void *value); 
 
 
-DBusGConnection *dbus_player_connect_to_dbus() {
-    // Connect to GLib/DBus 
+DBusGConnection *getSkypeDBusConnection() {
     GError *error = NULL;
 
     if (!dbus_conn) {
         dbus_conn = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 
         if (!dbus_conn) {
-			logToFile(LOG_DEBUG, "dbus_player_connect_to_dbus: Cannot connect to DBus: %s\n", error ? error->message : "");
+			logToFile(LOG_DEBUG, "getSkypeDBusConnection: Cannot connect to DBus: %s\n", error ? error->message : "");
 
             if (error)
                 g_error_free(error);
@@ -66,6 +64,7 @@ void setupSkypeFrameWork(JNIEnv *env)
 {
 	if (dbus_conn != NULL) 
 		return;
+    logDebug(env, "DBUS Native Lib setup");
 
     logToFile(LOG_DEBUG, "setupSkypeFrameWork");
 	g_type_init();
@@ -74,13 +73,10 @@ void setupSkypeFrameWork(JNIEnv *env)
     logToFile(LOG_DEBUG, "initializations done");
 
 	currentEnv = env;
-	dbus_conn = dbus_player_connect_to_dbus();
+	dbus_conn = getSkypeDBusConnection();
     logToFile(LOG_DEBUG, "connected to dbus");
 
-	proxy_send = dbus_g_proxy_new_for_name(dbus_conn,
-			"com.Skype.API",
-			"/com/Skype",
-			"com.Skype.API");
+	proxy_send = dbus_g_proxy_new_for_name(dbus_conn, "com.Skype.API", "/com/Skype", "com.Skype.API");
 	if (!proxy_send) {
 		throwInternalError(env, "Failed to connect to skype");
 	}
@@ -96,16 +92,16 @@ JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_setup0(JNIE
 	setupSkypeFrameWork(env);
 }
 
+gboolean stringIsNullOnlyOnOutOfMemoryError(JNIEnv *env, void *value); 
 gboolean isDuplicateMessage(JNIEnv* env, gchar * skypeNotification);
 static void fireNotificationReceived(JNIEnv *env, gchar *skypeNotification) {
 	if (isDuplicateMessage(env, skypeNotification))
 		return;
 
 	logDebug(env, "Received skype notification: %s\0", skypeNotification);
-		
 
 	jstring notificationString = (*env)->NewStringUTF(env, skypeNotification);
-	if (checkNull(env, (void *)notificationString)) {
+	if (stringIsNullOnlyOnOutOfMemoryError(env, (void *)notificationString)) {
 		return;
 	}
 
@@ -114,19 +110,27 @@ static void fireNotificationReceived(JNIEnv *env, gchar *skypeNotification) {
 	(*env)->CallStaticVoidMethod(env, clazz, method, notificationString);
 }
 
+gboolean stringIsNullOnlyOnOutOfMemoryError(JNIEnv *env, void *value) 
+{
+	if (value == NULL) {
+		jclass clazz = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
+		(*env)->ThrowNew(env, clazz, NULL);
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
+
 gboolean isDuplicateMessage(JNIEnv* env, gchar * skypeNotification)
 {
-	static char * lastReceivedMessage = NULL;
-	if (lastReceivedMessage != NULL) {
-		if (strcmp(skypeNotification, lastReceivedMessage) == 0) {
-			logDebug(env, "Ignoring duplicate notification: %s\0", skypeNotification);
-			free(lastReceivedMessage);
-			lastReceivedMessage = NULL;
-			return TRUE;
-		}
-		free(lastReceivedMessage);
+	static char lastReceivedMessage[SKYPE_STRING_MAX]="";
+
+	if (strcmp(skypeNotification, lastReceivedMessage) == 0) {
+		logDebug(env, "Ignoring duplicate notification: %s\0", skypeNotification);
+		return TRUE;
 	}
-	lastReceivedMessage = malloc(strlen(skypeNotification)+1);
+	
 	strcpy(lastReceivedMessage, skypeNotification);
 	return FALSE;
 }
@@ -227,16 +231,6 @@ static void throwInternalError(JNIEnv *env, char *message) {
 	(*env)->ThrowNew(env, clazz, message);
 }
 
-static gboolean checkNull(JNIEnv *env, void *value) 
-{
-	if (value == NULL) {
-		jclass clazz = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
-		(*env)->ThrowNew(env, clazz, NULL);
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
 // the following functions are just for testing
 void setup() {
 	setupSkypeFrameWork(NULL);

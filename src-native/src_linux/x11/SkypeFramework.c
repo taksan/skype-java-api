@@ -75,6 +75,8 @@ static Bool checkNull(JNIEnv *env, void *value) {
 
 void setupSkypeFrameWork(JNIEnv *env)
 {
+	logDebug(env, "X11 Native Lib setup");
+
 	currentEnv = env;
 
 	if (XInitThreads() == 0) {
