@@ -1,0 +1,34 @@
+Typical output of t1.c.
+
+First, start Skype.
+Then run 
+$ ./t1 
+Make or receive a call.
+
+Got=<OK>
+Got=<PROTOCOL 7>
+Setup of notify methods done and OK.
+skype_service_notify_callback, message:<CONNSTATUS ONLINE>
+skype_service_notify_callback, message:<CURRENTUSERHANDLE moma-antero>
+skype_service_notify_callback, message:<USERSTATUS ONLINE>
+skype_service_notify_callback, message:<USER anna.karoliina ONLINESTATUS ONLINE>
+skype_service_notify_callback, message:<USER anna.karoliina NROF_AUTHED_BUDDIES 0>
+skype_service_notify_callback, message:<GROUP 13 NROFUSERS 1>
+skype_service_notify_callback, message:<CALL 186 CONF_ID 0>
+skype_service_notify_callback, message:<USER anna.karoliina NROF_AUTHED_BUDDIES 2>
+skype_service_notify_callback, message:<CALL 186 STATUS RINGING>
+skype_service_notify_callback, message:<CALL 186 STATUS INPROGRESS>
+skype_service_notify_callback, message:<CALL 186 VIDEO_SEND_STATUS AVAILABLE>
+skype_service_notify_callback, message:<CALL 186 VIDEO_STATUS VIDEO_BOTH_ENABLED>
+skype_service_notify_callback, message:<CALL 186 DURATION 1>
+skype_service_notify_callback, message:<CALL 186 DURATION 2>
+skype_service_notify_callback, message:<CALL 186 DURATION 3>
+skype_service_notify_callback, message:<CALL 186 DURATION 4>
+skype_service_notify_callback, message:<CALL 186 DURATION 5>
+skype_service_notify_callback, message:<CALL 186 DURATION 6>
+...
+skype_service_notify_callback, message:<CALL 186 DURATION 60>
+skype_service_notify_callback, message:<CALL 186 DURATION 61
+skype_service_notify_callback, message:<CALL 186 FAILUREREASON 14>
+skype_service_notify_callback, message:<CALL 186 STATUS FINISHED>
+
