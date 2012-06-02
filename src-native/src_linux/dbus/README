@@ -1,0 +1,4 @@
+You must have the following packages installed to compile this:
+
+libdbus-glib-1-dev
+libdbus-1-dev

@@ -20,22 +20,16 @@
 # * Koji Hisano - initial API and implementation
 # * Gabriel Takeuchi - added support for 64 bit arch
 # ******************************************************************************/
-JDK_DIR = /usr/lib/jvm/java-6-openjdk/
+include ../Makefile.common
 
-CC = gcc
-CFLAGS = -pipe -g -fPIC -I../commons 
-#-Wall -W 
-INCPATH = -I. -I$(JDK_DIR)/include -I$(JDK_DIR)/include/linux
-LOGGING=../commons/Logging.c
 SOURCES = SkypeFramework.c Logging.c
 OBJECTS = $(SOURCES:.c=.o)
 OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 
 .SECONDEXPANSION:
 
-LINK = g++
 LD_FLAGS_i386 = -shared -L/usr/lib/i386-linux-gnu
-LD_FLAGS = -shared -L/usr/lib/x86_64-linux-gnu/
+LD_FLAGS := $(LD_FLAGS) -L/usr/lib/x86_64-linux-gnu/
 LIBS = -lX11
 
 PROJECT_ROOT=../../..
@@ -52,16 +46,4 @@ libskype_x64.so: SkypeFramework Logging
 skypetest: SkypeFramework.o skypetest.cpp
 	$(LINK) -o skypetest  $(OBJECTS_X64) skypetest.cpp -L/usr/lib/x86_64-linux-gnu/ -lX11 -lpthread
 
-com_skype_connector_linux_SkypeFramework.h:
-	javah -classpath $(TARGET_CLASSES) com.skype.connector.linux.SkypeFramework
 
-SkypeFramework: com_skype_connector_linux_SkypeFramework.h SkypeFramework.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $@.c
-
-Logging: com_skype_connector_linux_SkypeFramework.h $(LOGGING)
-	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $(LOGGING)
-	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $(LOGGING)
-
-clean:
-	rm -f com_skype_connector_linux_SkypeFramework.h *.o *.so skypetest

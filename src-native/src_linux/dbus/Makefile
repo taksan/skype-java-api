@@ -20,29 +20,18 @@
 # * Koji Hisano - initial API and implementation
 # * Gabriel Takeuchi - added support for 64 bit arch
 # ******************************************************************************/
-JDK_DIR = /usr/lib/jvm/java-6-openjdk/
 
-CC = gcc
-CFLAGS = -Wall -pipe -g -fPIC -I../commons $(shell pkg-config --cflags dbus-1 dbus-glib-1 )
-#-Wall -W 
-INCPATH = -I. -I$(JDK_DIR)/include -I$(JDK_DIR)/include/linux
-LOGGING=../commons/Logging.c
+include ../Makefile.common
+
+CFLAGS := $(CFLAGS) $(shell pkg-config --cflags dbus-1 dbus-glib-1 )
 SOURCES = SkypeFramework.c SkypeService.c Logging.c
-OBJECTS = $(SOURCES:.c=.o)
-OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 
 .SECONDEXPANSION:
 
-LINK = g++
-LD_FLAGS_i386 = -shared -L/usr/lib/i386-linux-gnu
-LD_FLAGS = -shared 
+LD_FLAGS_i386 := $(LD_FLAGS_i386) -L/usr/lib/i386-linux-gnu
 LIBS = $(shell pkg-config --libs dbus-1 dbus-glib-1)
 LIBS_32=$(shell pkg-config --libs dbus-1 dbus-glib-1)
 
-
-PROJECT_ROOT=../../..
-TARGET_CLASSES=$(PROJECT_ROOT)/target/classes
-TARGET=$(PROJECT_ROOT)/src/main/resources/
 
 all: libskype_dbus_x64.so
 
@@ -52,24 +41,8 @@ libskype_dbus_x86.so: SkypeFramework Logging SkypeService
 libskype_dbus_x64.so: SkypeFramework Logging SkypeService
 	$(LINK) $(LD_FLAGS) -m64 -o $(TARGET)/libskype_dbus_x64.so $(OBJECTS_X64) $(LIBS)
 
-skypetest: SkypeFramework.o skypetest.cpp SkypeService
-	$(LINK) -o skypetest  $(OBJECTS_X64) skypetest.cpp -L/usr/lib/x86_64-linux-gnu/ -lX11 -lpthread
-
-com_skype_connector_linux_SkypeFramework.h:
-	javah -classpath $(TARGET_CLASSES) com.skype.connector.linux.SkypeFramework
-
-SkypeFramework: com_skype_connector_linux_SkypeFramework.h SkypeFramework.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
-	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $@.c
-
-Logging: com_skype_connector_linux_SkypeFramework.h $(LOGGING)
-	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $(LOGGING)
-	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $(LOGGING)
-
 SkypeService: skype-service.h skype-service-object-glue.h SkypeService.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m64 -o $@_x64.o $@.c
 
 
-clean:
-	rm -f com_skype_connector_linux_SkypeFramework.h *.o *.so skypetest
