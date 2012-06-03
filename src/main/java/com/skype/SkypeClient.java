@@ -225,7 +225,7 @@ public final class SkypeClient {
     public static void showFileTransferWindow(String skypeId, File folder) throws SkypeException {
         Utils.checkNotNull("skypeId", skypeId);
         Utils.checkNotNull("folder", folder);
-        Utils.executeWithErrorCheck("OPEN FILETRANSFER " + skypeId + " IN " + folder);
+        Utils.executeWithErrorCheck("OPEN FILETRANSFER " + skypeId + " IN " + folder,"OK");
     }
 
     /**

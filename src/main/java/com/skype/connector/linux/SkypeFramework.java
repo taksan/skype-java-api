@@ -32,7 +32,8 @@ import com.skype.connector.ConnectorUtils;
 import com.skype.connector.LoadLibraryException;
 
 final class SkypeFramework {
-    private static Object initializedFieldMutex = new Object();
+    private static final String SKYPE_API_LINUX_IMPL_PROPERTY = "skype.api.impl";
+	private static Object initializedFieldMutex = new Object();
     private static boolean initialized = false;
 
     private static CountDownLatch eventLoopFinishedLatch;
@@ -65,7 +66,7 @@ final class SkypeFramework {
     }
 
 	private static String getLibName(String arch) {
-		String libImpl = System.getProperty("skype.api.impl", "x11");
+		String libImpl = System.getProperty(SKYPE_API_LINUX_IMPL_PROPERTY, "x11");
 		return "skype_"+libImpl+"_"+arch;
 	}
     

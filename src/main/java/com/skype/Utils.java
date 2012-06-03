@@ -226,6 +226,15 @@ final class Utils {
             convertToSkypeException(e);
         }
     }
+    
+	static void executeWithErrorCheck(String command, String responseheader) throws SkypeException {
+		try {
+            String response = Connector.getInstance().execute(command, responseheader);
+            checkError(response);
+        } catch (ConnectorException e) {
+            convertToSkypeException(e);
+        }
+	}
 
     /**
      * Check if a object isn't null, if it is Throw an NULLPOINTER exception.
