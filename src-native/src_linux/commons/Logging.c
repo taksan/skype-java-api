@@ -35,7 +35,7 @@
 
 const char * logLevelNames[3] = {"ERROR","INFO","DEBUG"};
 
-static FILE* logfile = NULL;
+FILE* logfile = NULL;
 void logToFile(int level, const char* fmt, ...);
 void log4jmessage(LoggerContext * loggerContext, int level, const char * message);
 
@@ -145,6 +145,10 @@ void logTimeAndLevel(int level) {
 	strftime (buffer,80,"%Y/%m/%d %H:%M:%S",timeinfo);
 
 	fprintf(logfile, "[%s] [%s]", buffer, logLevelNames[level]);
+}
+
+void openLogWithStdout() {
+	logfile = stdout;
 }
 
 void openLogFile(const char* logfilename)

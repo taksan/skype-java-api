@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.skype.Skype;
 import com.skype.connector.Connector;
 import com.skype.connector.ConnectorException;
 

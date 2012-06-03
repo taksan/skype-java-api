@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.SystemUtils;
 
+import com.skype.Skype;
 import com.skype.connector.ConnectorUtils;
 import com.skype.connector.LoadLibraryException;
 
@@ -39,9 +40,18 @@ final class SkypeFramework {
     private static CountDownLatch eventLoopFinishedLatch;
     private static Thread eventLoop;
     private static final List<SkypeFrameworkListener> listeners = new CopyOnWriteArrayList<SkypeFrameworkListener>();
+    public static boolean isDebugging;
+    
+    static void setDebugging(boolean debug) {
+    	isDebugging = true;
+    }
+    static boolean isDebugging() {
+    	return isDebugging;
+    }
     
     static void init() throws LoadLibraryException {
         synchronized(initializedFieldMutex) {
+//        	SkypeFramework.setDebugging(Skype.isDebuggingNativeLib);
             if (!initialized) {
             	if (SystemUtils.OS_ARCH.contains("64")) {
             		ConnectorUtils.loadLibrary(getLibName("x64"));

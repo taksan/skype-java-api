@@ -1031,6 +1031,8 @@ public final class Skype {
     }
 
     static Connector replacementConnectorInstance = null;
+
+	public static boolean isDebuggingNativeLib;
 	private static Connector getConnectorInstance() {
 		if (replacementConnectorInstance == null)
 			return Connector.getInstance();
@@ -1043,4 +1045,8 @@ public final class Skype {
      */
     private Skype() {
     }
+
+	public static void setDebugNative(boolean b) {
+		isDebuggingNativeLib = b;
+	}
 }

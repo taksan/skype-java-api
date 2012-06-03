@@ -40,6 +40,7 @@ typedef struct  {
 LoggerContext * getLoggerContext(JNIEnv *env);
 
 
+void openLogWithStdout();
 void openLogFile(const char* logfilename);
 void logToFile(int level, const char* fmt, ...);
 

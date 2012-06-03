@@ -40,6 +40,14 @@ static DBusGProxy *proxy_send = NULL;
 static SkypeService *service_object = NULL;
 
 static void throwInternalError(JNIEnv *env, char *message);
+gboolean startsWith(const char * subject, const char * prefix);
+gboolean endsWith(const char * subject, const char * trail);
+
+typedef enum {
+	IssuerNone,
+	IssuerCallback,
+	IssuerCommandReply
+}IssuerType;
 
 
 DBusGConnection *getSkypeDBusConnection() {
@@ -88,14 +96,25 @@ void setupSkypeFrameWork(JNIEnv *env)
     logToFile(LOG_DEBUG, "DBUS Skype connection done.");
 }
 
+void initDebugging(JNIEnv *env, jclass this) {
+	jfieldID fid = (*env)->GetStaticFieldID(env, this, "isDebugging", "Z");
+	if (fid == NULL) return; 
+
+	jboolean isDebugging = (*env)->GetStaticBooleanField(env, this, fid);
+	if (isDebugging) {
+		openLogWithStdout();
+	}
+}
+
 JNIEXPORT void JNICALL Java_com_skype_connector_linux_SkypeFramework_setup0(JNIEnv *env, jclass this) {
+	initDebugging(env, this);
 	setupSkypeFrameWork(env);
 }
 
 gboolean stringIsNullOnlyOnOutOfMemoryError(JNIEnv *env, void *value); 
-gboolean isDuplicateMessage(JNIEnv* env, gchar * skypeNotification);
-static void fireNotificationReceived(JNIEnv *env, gchar *skypeNotification) {
-	if (isDuplicateMessage(env, skypeNotification))
+gboolean isDuplicateChatSentNotification(JNIEnv* env, gchar * skypeNotification, IssuerType type);
+static void fireNotificationReceived(JNIEnv *env, gchar *skypeNotification, IssuerType type) {
+	if (isDuplicateChatSentNotification(env, skypeNotification, type))
 		return;
 
 	logDebug(env, "Received skype notification: %s\0", skypeNotification);
@@ -121,14 +140,17 @@ gboolean stringIsNullOnlyOnOutOfMemoryError(JNIEnv *env, void *value)
 	}
 }
 
-
-gboolean isDuplicateMessage(JNIEnv* env, gchar * skypeNotification)
+gboolean isDuplicateChatSentNotification(JNIEnv* env, gchar * skypeNotification, IssuerType type)
 {
 	static char lastReceivedMessage[SKYPE_STRING_MAX]="";
+	if (type != IssuerCallback)
+		return FALSE;
 
 	if (strcmp(skypeNotification, lastReceivedMessage) == 0) {
-		logDebug(env, "Ignoring duplicate notification: %s\0", skypeNotification);
-		return TRUE;
+		if (startsWith(skypeNotification, "CHATMESSAGE") && endsWith(skypeNotification,"STATUS SENT")) {
+			logDebug(env, "Ignoring duplicate notification: %s\0", skypeNotification);
+			return TRUE;
+		}
 	}
 	
 	strcpy(lastReceivedMessage, skypeNotification);
@@ -138,7 +160,7 @@ gboolean isDuplicateMessage(JNIEnv* env, gchar * skypeNotification)
 JNIEnv *eventLoopEnv = NULL;
 gboolean skype_service_notify_callback(SkypeService *object, gchar *message, GError **error) {
     logToFile(LOG_DEBUG, "skype_service_notify_callback, message:<%s>", message);
-	fireNotificationReceived(eventLoopEnv, message);
+	fireNotificationReceived(eventLoopEnv, message, IssuerCallback);
 
     return TRUE;
 }
@@ -204,7 +226,7 @@ static void sendCommand(JNIEnv *env, const char *command) {
 	if (success) {
 		if (str != NULL) {
 			logDebug(env, "Proxy call returned string: %s\0", str);
-			fireNotificationReceived(env, str);
+			fireNotificationReceived(env, str, IssuerCommandReply);
 			g_free(str);
 		}
 		return;
@@ -229,6 +251,18 @@ static void throwInternalError(JNIEnv *env, char *message) {
 	}
 	jclass clazz = (*env)->FindClass(env, "java/lang/InternalError");
 	(*env)->ThrowNew(env, clazz, message);
+}
+
+gboolean startsWith(const char * subject, const char * prefix)
+{
+ 	return strncmp(subject, prefix, strlen(prefix)) == 0;
+}
+
+gboolean endsWith(const char * subject, const char * trail)
+{
+	int startMatchIndex = strlen(subject) - strlen(trail);
+	const char * from = subject+startMatchIndex;
+	return strcmp(from, trail) == 0;
 }
 
 // the following functions are just for testing
