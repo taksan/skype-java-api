@@ -23,23 +23,18 @@
 include ../Makefile.common
 
 SOURCES = SkypeFramework.c Logging.c
-OBJECTS = $(SOURCES:.c=.o)
-OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 
 .SECONDEXPANSION:
 
+IMPLEMENTATION=x11
 LIBS = -lX11
 
-PROJECT_ROOT=../../..
-TARGET_CLASSES=$(PROJECT_ROOT)/target/classes
-TARGET=$(PROJECT_ROOT)/src/main/resources/
+all: $(X86) $(X64)
 
-all: libskype_x86.so libskype_x64.so
-
-libskype_x86.so: SkypeFramework Logging
-	$(LINK) $(LD_FLAGS) -m32 -o $(TARGET)/libskype_x86.so $(OBJECTS) $(LIBS) 
-libskype_x64.so: SkypeFramework Logging
-	$(LINK) $(LD_FLAGS) -m64 -o $(TARGET)/libskype_x64.so $(OBJECTS_X64) $(LIBS)
+$(X86): SkypeFramework Logging
+	$(LINK) $(LD_FLAGS) -m32 -o $(TARGET)/$(X86) $(OBJECTS) $(LIBS) 
+$(X64): SkypeFramework Logging
+	$(LINK) $(LD_FLAGS) -m64 -o $(TARGET)/$(X64) $(OBJECTS_X64) $(LIBS)
 
 skypetest: SkypeFramework.o skypetest.cpp
 	$(LINK) -o skypetest  $(OBJECTS_X64) skypetest.cpp  -lX11 -lpthread

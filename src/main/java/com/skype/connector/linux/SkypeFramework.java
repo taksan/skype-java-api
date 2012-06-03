@@ -46,7 +46,7 @@ final class SkypeFramework {
             		ConnectorUtils.loadLibrary(getLibName("x64"));
             	}
             	else {
-            		ConnectorUtils.loadLibrary("skype_x86");
+            		ConnectorUtils.loadLibrary(getLibName("skype_x86"));
             	}
                 setup0();
                 
@@ -65,9 +65,8 @@ final class SkypeFramework {
     }
 
 	private static String getLibName(String arch) {
-		if (System.getProperty("skype.api.impl.dbus")!=null)
-			return "skype_dbus_"+arch;
-		return "skype_"+arch;
+		String libImpl = System.getProperty("skype.api.impl", "x11");
+		return "skype_"+libImpl+"_"+arch;
 	}
     
     private static native void setup0();

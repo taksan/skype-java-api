@@ -23,6 +23,7 @@
 
 include ../Makefile.common
 
+IMPLEMENTATION=dbus
 CFLAGS := $(CFLAGS) $(shell pkg-config --cflags dbus-1 dbus-glib-1 )
 SOURCES = SkypeFramework.c SkypeService.c Logging.c
 
@@ -31,14 +32,13 @@ SOURCES = SkypeFramework.c SkypeService.c Logging.c
 LIBS = $(shell pkg-config --libs dbus-1 dbus-glib-1)
 LIBS_32=$(shell pkg-config --libs dbus-1 dbus-glib-1)
 
+all: $(X64) $(X86)
 
-all: libskype_dbus_x64.so libskype_dbus_x86.so
+$(X86): SkypeFramework Logging SkypeService
+	$(LINK) $(LD_FLAGS) -m32 -o $(TARGET)/$(X86) $(OBJECTS) $(LIBS_32) 
 
-libskype_dbus_x86.so: SkypeFramework Logging SkypeService
-	$(LINK) $(LD_FLAGS) -m32 -o $(TARGET)/libskype_dbus_x86.so $(OBJECTS) $(LIBS_32) 
-
-libskype_dbus_x64.so: SkypeFramework Logging SkypeService
-	$(LINK) $(LD_FLAGS) -m64 -o $(TARGET)/libskype_dbus_x64.so $(OBJECTS_X64) $(LIBS)
+$(X64): SkypeFramework Logging SkypeService
+	$(LINK) $(LD_FLAGS) -m64 -o $(TARGET)/$(X64) $(OBJECTS_X64) $(LIBS)
 
 SkypeService: skype-service.h skype-service-object-glue.h SkypeService.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -m32 -o $@.o $@.c
