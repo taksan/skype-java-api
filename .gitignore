@@ -3,3 +3,5 @@ target/*
 .*.swp
 build
 *.o
+com_skype_connector_linux_SkypeFramework.h
+skypetest
