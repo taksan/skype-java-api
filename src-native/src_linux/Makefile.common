@@ -11,6 +11,8 @@ TARGET=$(PROJECT_ROOT)/src/main/resources/
 OBJECTS = $(SOURCES:.c=.o)
 OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 
+PWD=$(shell pwd)
+IMPLEMENTATION=$(shell basename $(PWD))
 X86=libskype_$(IMPLEMENTATION)_x86.so
 X64=libskype_$(IMPLEMENTATION)_x64.so
 

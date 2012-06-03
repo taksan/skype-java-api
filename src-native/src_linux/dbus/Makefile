@@ -23,7 +23,6 @@
 
 include ../Makefile.common
 
-IMPLEMENTATION=dbus
 CFLAGS := $(CFLAGS) $(shell pkg-config --cflags dbus-1 dbus-glib-1 )
 SOURCES = SkypeFramework.c SkypeService.c Logging.c
 

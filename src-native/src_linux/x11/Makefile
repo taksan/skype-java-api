@@ -26,7 +26,6 @@ SOURCES = SkypeFramework.c Logging.c
 
 .SECONDEXPANSION:
 
-IMPLEMENTATION=x11
 LIBS = -lX11
 
 all: $(X86) $(X64)
