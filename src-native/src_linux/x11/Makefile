@@ -28,8 +28,6 @@ OBJECTS_X64 = $(SOURCES:.c=_x64.o)
 
 .SECONDEXPANSION:
 
-LD_FLAGS_i386 = -shared -L/usr/lib/i386-linux-gnu
-LD_FLAGS := $(LD_FLAGS) -L/usr/lib/x86_64-linux-gnu/
 LIBS = -lX11
 
 PROJECT_ROOT=../../..
@@ -39,11 +37,11 @@ TARGET=$(PROJECT_ROOT)/src/main/resources/
 all: libskype_x86.so libskype_x64.so
 
 libskype_x86.so: SkypeFramework Logging
-	$(LINK) $(LD_FLAGS_i386) -shared  -m32 -o $(TARGET)/libskype_x86.so $(OBJECTS) $(LIBS) 
+	$(LINK) $(LD_FLAGS) -m32 -o $(TARGET)/libskype_x86.so $(OBJECTS) $(LIBS) 
 libskype_x64.so: SkypeFramework Logging
 	$(LINK) $(LD_FLAGS) -m64 -o $(TARGET)/libskype_x64.so $(OBJECTS_X64) $(LIBS)
 
 skypetest: SkypeFramework.o skypetest.cpp
-	$(LINK) -o skypetest  $(OBJECTS_X64) skypetest.cpp -L/usr/lib/x86_64-linux-gnu/ -lX11 -lpthread
+	$(LINK) -o skypetest  $(OBJECTS_X64) skypetest.cpp  -lX11 -lpthread
 
 

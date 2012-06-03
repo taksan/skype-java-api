@@ -4,7 +4,6 @@ CFLAGS = -Wall -pipe -g -fPIC -I../commons $(shell pkg-config --cflags dbus-1 db
 INCPATH = -I. -I$(JDK_DIR)/include -I$(JDK_DIR)/include/linux
 LOGGING=../commons/Logging.c
 LINK = g++
-LD_FLAGS_i386 = -shared
 LD_FLAGS = -shared 
 PROJECT_ROOT=../../..
 TARGET_CLASSES=$(PROJECT_ROOT)/target/classes

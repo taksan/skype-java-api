@@ -28,15 +28,14 @@ SOURCES = SkypeFramework.c SkypeService.c Logging.c
 
 .SECONDEXPANSION:
 
-LD_FLAGS_i386 := $(LD_FLAGS_i386) -L/usr/lib/i386-linux-gnu
 LIBS = $(shell pkg-config --libs dbus-1 dbus-glib-1)
 LIBS_32=$(shell pkg-config --libs dbus-1 dbus-glib-1)
 
 
-all: libskype_dbus_x64.so
+all: libskype_dbus_x64.so libskype_dbus_x86.so
 
 libskype_dbus_x86.so: SkypeFramework Logging SkypeService
-	$(LINK) $(LD_FLAGS_i386) -shared  -m32 -o $(TARGET)/libskype_dbus_x86.so $(OBJECTS) $(LIBS_32) 
+	$(LINK) $(LD_FLAGS) -m32 -o $(TARGET)/libskype_dbus_x86.so $(OBJECTS) $(LIBS_32) 
 
 libskype_dbus_x64.so: SkypeFramework Logging SkypeService
 	$(LINK) $(LD_FLAGS) -m64 -o $(TARGET)/libskype_dbus_x64.so $(OBJECTS_X64) $(LIBS)
