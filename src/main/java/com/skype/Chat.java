@@ -22,8 +22,10 @@
  ******************************************************************************/
 package com.skype;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.skype.connector.Connector;
@@ -48,11 +50,37 @@ public final class Chat extends SkypeObject {
     static Chat getInstance(final String id) {
         synchronized(chats) {
             if (!chats.containsKey(id)) {
-                chats.put(id, new Chat(id));
+                Chat chat = new Chat(id);
+				chats.put(id, chat);
             }
             return chats.get(id);
         }
     }
+
+	private final class ChatInstanceListener implements GlobalChatListener {
+		@Override
+		public void userLeft(Chat chat, User user) {
+			if (chat.equals(Chat.this)) {
+				for (ChatListener listener : instanceChatListeners) {
+					listener.userLeft(user);
+				}
+			}
+		}
+
+		@Override
+		public void userAdded(Chat chat, User user) {
+			if (chat.equals(Chat.this)) {
+				for (ChatListener listener : instanceChatListeners) {
+					listener.userAdded(user);
+				}
+			}
+		}
+
+		@Override
+		public void newChatStarted(Chat chat, User[] users) {
+		}
+	}
+
 
 	/**
 	 * Enumeration of the status of CHAT object.
@@ -152,22 +180,6 @@ public final class Chat extends SkypeObject {
         } catch (ConnectorException e) {
             Utils.convertToSkypeException(e);
         }
-    }
-
-    /**
-     * Return a comma seperated String of Usernames.
-     * @param users The users to put into the String.
-     * @return The comma seperated string.
-     */
-    private static String toCommaSeparatedString(User[] users) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < users.length; i++) {
-            if (i != 0) {
-                builder.append(", ");
-            }
-            builder.append(users[i].getId());
-        }
-        return builder.toString();
     }
 
     /**
@@ -323,33 +335,6 @@ public final class Chat extends SkypeObject {
     }
 
     /**
-     * Get a property of a User who is member in this chat.
-     * @param name Username.
-     * @return Array of user.
-     * @throws SkypeException when connection has gone bad.
-     */
-    private User[] getUsersProperty(String name) throws SkypeException {
-        try {
-            String command = "GET CHAT " + getId() + " " + name;
-            String responseHeader = "CHAT " + id + " " + name + " ";
-            String response = Connector.getInstance().execute(command, responseHeader);
-            String data = response.substring(responseHeader.length());
-            if ("".equals(data)) {
-                return new User[0];
-            }
-            String[] ids = data.split(" ");
-            User[] users = new User[ids.length];
-            for (int i = 0; i < ids.length; ++i) {
-                users[i] = User.getInstance(ids[i]);
-            }
-            return users;
-        } catch (ConnectorException ex) {
-            Utils.convertToSkypeException(ex);
-            return null;
-        }
-    }
-
-    /**
      * Indicates if this chat has been bookmarked.
      * @return true if this chat is bookmarked
      * @throws SkypeException when the connection has gone bad.
@@ -357,8 +342,77 @@ public final class Chat extends SkypeObject {
     public boolean isBookmarked() throws SkypeException {
         return Boolean.parseBoolean(getProperty("BOOKMARKED"));
     }
+    
+    List<ChatListener> instanceChatListeners = new ArrayList<ChatListener>();
+    public void addListener(ChatListener listener) throws SkypeException
+    {
+    	if (localListener == null)
+			createInstanceChatListenerDelegator();
+    	synchronized (instanceChatListeners) {
+    		instanceChatListeners.add(listener);
+		}
+    }
+    
+    public void removeListener(ChatListener listener) {
+    	synchronized (instanceChatListeners) {
+    		instanceChatListeners.remove(listener);
+		}
+    }
+
+	private void createInstanceChatListenerDelegator() throws SkypeException {
+		localListener = new ChatInstanceListener();
+		Skype.addGlobalChatListener(localListener, this);
+	}
+    
+	private GlobalChatListener localListener;
+  
 
     /**
+	 * Return a comma seperated String of Usernames.
+	 * @param users The users to put into the String.
+	 * @return The comma seperated string.
+	 */
+	private static String toCommaSeparatedString(User[] users) {
+	    StringBuilder builder = new StringBuilder();
+	    for (int i = 0; i < users.length; i++) {
+	        if (i != 0) {
+	            builder.append(", ");
+	        }
+	        builder.append(users[i].getId());
+	    }
+	    return builder.toString();
+	}
+
+
+	/**
+	 * Get a property of a User who is member in this chat.
+	 * @param name Username.
+	 * @return Array of user.
+	 * @throws SkypeException when connection has gone bad.
+	 */
+	private User[] getUsersProperty(String name) throws SkypeException {
+	    try {
+	        String command = "GET CHAT " + getId() + " " + name;
+	        String responseHeader = "CHAT " + id + " " + name + " ";
+	        String response = Connector.getInstance().execute(command, responseHeader);
+	        String data = response.substring(responseHeader.length());
+	        if ("".equals(data)) {
+	            return new User[0];
+	        }
+	        String[] ids = data.split(" ");
+	        User[] users = new User[ids.length];
+	        for (int i = 0; i < ids.length; ++i) {
+	            users[i] = User.getInstance(ids[i]);
+	        }
+	        return users;
+	    } catch (ConnectorException ex) {
+	        Utils.convertToSkypeException(ex);
+	        return null;
+	    }
+	}
+
+
+	/**
      * Return a property of this CHAT.
      * @param name propertyname.
      * @return value of the property.

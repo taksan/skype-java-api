@@ -28,7 +28,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.SystemUtils;
 
-import com.skype.Skype;
 import com.skype.connector.ConnectorUtils;
 import com.skype.connector.LoadLibraryException;
 

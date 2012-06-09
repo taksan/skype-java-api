@@ -26,7 +26,11 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.skype.connector.*;
+import com.skype.connector.AbstractConnectorListener;
+import com.skype.connector.Connector;
+import com.skype.connector.ConnectorException;
+import com.skype.connector.ConnectorListener;
+import com.skype.connector.ConnectorMessageEvent;
 
 /**
  * Skype information model (not view) class of Skype4Java.
@@ -857,6 +861,7 @@ public final class Skype {
             }
         }
     }
+    
 
     /**
      * Remove a listener for CHATMESSAGE events.
@@ -1005,6 +1010,30 @@ public final class Skype {
             }
         }
     }
+    
+    static Object chatListenerManagerMutex = new Object();
+	static ChatListenerMananager chatListenerManager = null;
+	public static void addGlobalChatListener(GlobalChatListener listener) throws SkypeException {
+		synchronized (chatListenerManagerMutex ) {
+			if (chatListenerManager == null) {
+				chatListenerManager = new ChatListenerMananager();
+				addChatMessageListener(chatListenerManager);
+			}
+			chatListenerManager.addGlobalChatListener(listener);
+		}
+	}
+	
+	public static void removeGlobalChatListener(GlobalChatListener listener) {
+		synchronized (chatListenerManager) {
+			if (chatListenerManager == null) return;
+			chatListenerManager.addGlobalChatListener(listener);
+		}
+	}
+	
+	static void addGlobalChatListener(GlobalChatListener listener, Chat chat) throws SkypeException {
+		addGlobalChatListener(listener);
+		chatListenerManager.addManaged(chat);
+	}
 
     /**
      * Use another exceptionhandler then the default one.
