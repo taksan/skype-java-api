@@ -848,6 +848,14 @@ public final class Skype {
                                             handleUncaughtException(e);
                                         }
                                     }
+                                } else if ("READ".equals(propertyValue)) {
+                                    for (ChatMessageListener listener : listeners) {
+                                        try {
+                                            listener.chatMessageReceived(chatMessage);
+                                        } catch (Throwable e) {
+                                            handleUncaughtException(e);
+                                        }
+                                    }
                                 }
                             }
                         }
