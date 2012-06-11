@@ -821,6 +821,7 @@ public final class Skype {
             chatMessageListeners.add(listener);
             if (chatMessageListener == null) {
                 chatMessageListener = new AbstractConnectorListener() {
+                	String lastId = "";
                     public void messageReceived(ConnectorMessageEvent event) {
                         String message = event.getMessage();
                         if (message.startsWith("CHATMESSAGE ")) {
@@ -841,25 +842,26 @@ public final class Skype {
                                         }
                                     }
                                 } else if ("RECEIVED".equals(propertyValue)) {
-                                    for (ChatMessageListener listener : listeners) {
-                                        try {
-                                            listener.chatMessageReceived(chatMessage);
-                                        } catch (Throwable e) {
-                                            handleUncaughtException(e);
-                                        }
-                                    }
+                                    fireMessageReceived(listeners, chatMessage);
+                                    lastId = chatMessage.getId();
                                 } else if ("READ".equals(propertyValue)) {
-                                    for (ChatMessageListener listener : listeners) {
-                                        try {
-                                            listener.chatMessageReceived(chatMessage);
-                                        } catch (Throwable e) {
-                                            handleUncaughtException(e);
-                                        }
-                                    }
+                                    fireMessageReceived(listeners, chatMessage);
                                 }
                             }
                         }
                     }
+					private void fireMessageReceived(ChatMessageListener[] listeners, ChatMessage chatMessage) {
+						if (lastId.equals(chatMessage.getId())) {
+							return;
+						}
+						for (ChatMessageListener listener : listeners) {
+						    try {
+						        listener.chatMessageReceived(chatMessage);
+						    } catch (Throwable e) {
+						        handleUncaughtException(e);
+						    }
+						}
+					}
                 };
                 try {
                     getConnectorInstance().addConnectorListener(chatMessageListener);
