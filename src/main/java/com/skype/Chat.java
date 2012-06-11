@@ -154,6 +154,22 @@ public final class Chat extends SkypeObject {
             Utils.convertToSkypeException(e);
         }
     }
+    
+    /**
+     * Set the guidelines of this CHAT.
+     * @param newValue The new guidelines.
+     * @throws SkypeException when the connection has gone bad.
+     */
+    public void setGuidelines(String newValue) throws SkypeException {
+    	try {
+            String command = "ALTER CHAT " + getId() + " SETGUIDELINES " + newValue;
+            String responseHeader = "ALTER CHAT SETGUIDELINES";
+            String response = Connector.getInstance().execute(command, responseHeader);
+            Utils.checkError(response);
+        } catch (ConnectorException e) {
+            Utils.convertToSkypeException(e);
+        }
+    }
 
     /**
      * Add a User to this CHAT.
