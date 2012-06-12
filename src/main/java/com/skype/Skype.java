@@ -26,11 +26,9 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.skype.connector.AbstractConnectorListener;
 import com.skype.connector.Connector;
 import com.skype.connector.ConnectorException;
 import com.skype.connector.ConnectorListener;
-import com.skype.connector.ConnectorMessageEvent;
 
 /**
  * Skype information model (not view) class of Skype4Java.
@@ -39,68 +37,7 @@ import com.skype.connector.ConnectorMessageEvent;
  * @author Koji Hisano
  */
 public final class Skype {
-    private static final class ConnectorListenerImpl extends
-			AbstractConnectorListener {
-		public void messageReceived(ConnectorMessageEvent event) {
-			String message = event.getMessage();
-			if (message.startsWith("CALL ")) {
-				String data = message.substring("CALL ".length());
-				String id = data.substring(0, data.indexOf(' '));
-				String propertyNameAndValue = data
-						.substring(data.indexOf(' ') + 1);
-				String propertyName = propertyNameAndValue.substring(0,
-						propertyNameAndValue.indexOf(' '));
-				if ("STATUS".equals(propertyName)) {
-					String propertyValue = propertyNameAndValue
-							.substring(propertyNameAndValue.indexOf(' ') + 1);
-					Call.Status status = Call.Status.valueOf(propertyValue);
-					Call call = Call.getInstance(id);
-					EXIT: if (status == Call.Status.ROUTING || status == Call.Status.RINGING) {
-						synchronized (call) {
-							if (call.isCallListenerEventFired()) {
-								break EXIT;
-							}
-							call.setCallListenerEventFired(true);
-							CallListener[] listeners = callListeners
-									.toArray(new CallListener[0]);
-							try {
-								switch (call.getType()) {
-								case OUTGOING_P2P:
-								case OUTGOING_PSTN:
-									for (CallListener listener : listeners) {
-										try {
-											listener.callMaked(call);
-										} catch (Throwable e) {
-											handleUncaughtException(e);
-										}
-									}
-									break;
-								case INCOMING_P2P:
-								case INCOMING_PSTN:
-									for (CallListener listener : listeners) {
-										try {
-											listener.callReceived(call);
-										} catch (Throwable e) {
-											handleUncaughtException(e);
-										}
-									}
-									break;
-								default:
-									// Should an exception be thrown?
-									break;
-								}
-							} catch (Throwable e) {
-								handleUncaughtException(e);
-							}
-						}
-					}
-					call.fireStatusChanged(status);
-				}
-			}
-		}
-	}
-
-	/**
+    /**
      * The library version.
      */
     public static final String LIBRARY_VERSION = "1.0.0.0";
@@ -116,21 +53,21 @@ public final class Skype {
     /** CHATMESSAGE listener. */
     private static ConnectorListener chatMessageListener;
     /** Collection of listeners. */
-    private static List<ChatMessageListener> chatMessageListeners = new CopyOnWriteArrayList<ChatMessageListener>();
+    static List<ChatMessageListener> chatMessageListeners = new CopyOnWriteArrayList<ChatMessageListener>();
 
     /** callListener lock object. */
     private static Object callListenerMutex = new Object();
     /** CALL listener. */
     private static ConnectorListener callListener;
     /** Collection of all CALL listeners. */
-    private static List<CallListener> callListeners = new CopyOnWriteArrayList<CallListener>();
+    static List<CallListener> callListeners = new CopyOnWriteArrayList<CallListener>();
 
     /** voiceMailListener lock object. */
     private static Object voiceMailListenerMutex = new Object();
     /** VOICEMAIL listener. */
     private static ConnectorListener voiceMailListener;
     /** Collection of all VOICEMAIL listeners. */
-    private static List<VoiceMailListener> voiceMailListeners = new CopyOnWriteArrayList<VoiceMailListener>();
+    static List<VoiceMailListener> voiceMailListeners = new CopyOnWriteArrayList<VoiceMailListener>();
 
     /** User threading lock object. */
     private static Object userThreadFieldMutex = new Object();
@@ -820,49 +757,7 @@ public final class Skype {
         synchronized (chatMessageListenerMutex) {
             chatMessageListeners.add(listener);
             if (chatMessageListener == null) {
-                chatMessageListener = new AbstractConnectorListener() {
-                	String lastId = "";
-                    public void messageReceived(ConnectorMessageEvent event) {
-                        String message = event.getMessage();
-                        if (message.startsWith("CHATMESSAGE ")) {
-                            String data = message.substring("CHATMESSAGE ".length());
-                            String id = data.substring(0, data.indexOf(' '));
-                            String propertyNameAndValue = data.substring(data.indexOf(' ') + 1);
-                            String propertyName = propertyNameAndValue.substring(0, propertyNameAndValue.indexOf(' '));
-                            if ("STATUS".equals(propertyName)) {
-                                String propertyValue = propertyNameAndValue.substring(propertyNameAndValue.indexOf(' ') + 1);
-                                ChatMessageListener[] listeners = chatMessageListeners.toArray(new ChatMessageListener[0]);
-                                ChatMessage chatMessage = ChatMessage.getInstance(id);
-                                if ("SENT".equals(propertyValue)) {
-                                    for (ChatMessageListener listener : listeners) {
-                                        try {
-                                            listener.chatMessageSent(chatMessage);
-                                        } catch (Throwable e) {
-                                            handleUncaughtException(e);
-                                        }
-                                    }
-                                } else if ("RECEIVED".equals(propertyValue)) {
-                                    fireMessageReceived(listeners, chatMessage);
-                                    lastId = chatMessage.getId();
-                                } else if ("READ".equals(propertyValue)) {
-                                    fireMessageReceived(listeners, chatMessage);
-                                }
-                            }
-                        }
-                    }
-					private void fireMessageReceived(ChatMessageListener[] listeners, ChatMessage chatMessage) {
-						if (lastId.equals(chatMessage.getId())) {
-							return;
-						}
-						for (ChatMessageListener listener : listeners) {
-						    try {
-						        listener.chatMessageReceived(chatMessage);
-						    } catch (Throwable e) {
-						        handleUncaughtException(e);
-						    }
-						}
-					}
-                };
+                chatMessageListener = new ChatMessageConnectorListener();
                 try {
                     getConnectorInstance().addConnectorListener(chatMessageListener);
                 } catch (ConnectorException e) {
@@ -953,49 +848,7 @@ public final class Skype {
         synchronized (voiceMailListenerMutex) {
             voiceMailListeners.add(listener);
             if (voiceMailListener == null) {
-                voiceMailListener = new AbstractConnectorListener() {
-                    public void messageReceived(ConnectorMessageEvent event) {
-                        String message = event.getMessage();
-                        if (message.startsWith("VOICEMAIL ")) {
-                            String data = message.substring("VOICEMAIL ".length());
-                            String id = data.substring(0, data.indexOf(' '));
-                            String propertyNameAndValue = data.substring(data.indexOf(' ') + 1);
-                            String propertyName = propertyNameAndValue.substring(0, propertyNameAndValue.indexOf(' '));
-                            if ("TYPE".equals(propertyName)) {
-                                String propertyValue = propertyNameAndValue.substring(propertyNameAndValue.indexOf(' ') + 1);
-                                VoiceMail.Type type = VoiceMail.Type.valueOf(propertyValue);
-                                VoiceMail voiceMail = VoiceMail.getInstance(id);
-                                VoiceMailListener[] listeners = voiceMailListeners.toArray(new VoiceMailListener[0]);
-                                switch (type) {
-                                    case OUTGOING:
-                                        for (VoiceMailListener listener : listeners) {
-                                            try {
-                                                listener.voiceMailMade(voiceMail);
-                                            } catch (Throwable e) {
-                                                handleUncaughtException(e);
-                                            }
-                                        }
-                                        break;
-                                    case INCOMING:
-                                        for (VoiceMailListener listener : listeners) {
-                                            try {
-                                                listener.voiceMailReceived(voiceMail);
-                                            } catch (Throwable e) {
-                                                handleUncaughtException(e);
-                                            }
-                                        }
-                                        break;
-                                    case DEFAULT_GREETING:
-                                    case CUSTOM_GREETING:
-                                    case UNKNOWN:
-                                    default:
-                                        // do nothing
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                };
+                voiceMailListener = new VoiceMailConnectorListener();
                 try {
                     getConnectorInstance().addConnectorListener(voiceMailListener);
                 } catch (ConnectorException e) {
