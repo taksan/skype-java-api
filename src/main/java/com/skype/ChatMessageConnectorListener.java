@@ -9,6 +9,7 @@ final class ChatMessageConnectorListener extends AbstractConnectorListener {
 	private static final String RECEIVED_MESSAGE_SUFFIX = "RECEIVED";
 	private static final String SENT_MESSAGE_SUFFIX = "SENT";
 	String lastReceivedId = "";
+	private String lastReceivedReadId = "";
 
 	public void messageReceived(ConnectorMessageEvent event) {
 	    String message = event.getMessage();
@@ -24,11 +25,18 @@ final class ChatMessageConnectorListener extends AbstractConnectorListener {
 	            if (SENT_MESSAGE_SUFFIX.equals(propertyValue)) {
 	                fireMessageSent(listeners, chatMessage);
 	            } else if (RECEIVED_MESSAGE_SUFFIX.equals(propertyValue)) {
+	            	if (lastReceivedReadId.equals(chatMessage.getId())) {
+	        			return;
+	        		}
 	                fireMessageReceived(listeners, chatMessage);
 	                lastReceivedId = chatMessage.getId();
 	            } else if (READ_MESSAGE_SUFFIX.equals(propertyValue)) {
+	            	if (lastReceivedId.equals(chatMessage.getId())) {
+	        			return;
+	        		}
 	            	// sometimes a RECEIVED notification doesnt show up
 	                fireMessageReceived(listeners, chatMessage);
+	                lastReceivedReadId = chatMessage.getId();
 	            }
 	        }
 	    }
@@ -44,10 +52,7 @@ final class ChatMessageConnectorListener extends AbstractConnectorListener {
 		}
 	}
 
-	private void fireMessageReceived(ChatMessageListener[] listeners, ChatMessage chatMessage) {
-		if (lastReceivedId.equals(chatMessage.getId())) {
-			return;
-		}
+	private void fireMessageReceived(ChatMessageListener[] listeners, ChatMessage chatMessage) {		
 		for (ChatMessageListener listener : listeners) {
 		    try {
 		        listener.chatMessageReceived(chatMessage);
