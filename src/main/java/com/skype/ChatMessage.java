@@ -56,16 +56,27 @@ public final class ChatMessage extends SkypeObject {
      * Enumeration for type.
      */
 	public enum Type {
-		/**
-		 * SETTOPIC - change of chat topic.
-		 * SAID - IM.
-		 * ADDEDMEMBERS - invited someone to chat.
-		 * SAWMEMBERS - chat participant has seen other members.
-		 * CREATEDCHATWITH - chat to multiple people is created.
-		 * LEFT - someone left chat; can also be a notification if somebody cannot be added to chat.
-		 * UNKNOWN - other.
-		 */
-        SETTOPIC, SAID, ADDEDMEMBERS, SAWMEMBERS, CREATEDCHATWITH, LEFT, UNKNOWN;
+        SETTOPIC,            //change of chat topic
+        SAID,                //IM
+        ADDEDMEMBERS,        //invited someone to chat
+        SAWMEMBERS,          //chat participant has seen other members
+        CREATEDCHATWITH,     //chat to multiple people is created
+        LEFT,                //someone left chat; can also be a notification if somebody cannot be added to chat
+        POSTEDCONTACTS,      //when one user sends contacts to another. Added in protocol 7.
+        GAP_IN_CHAT,         //messages of this type are generated locally, during synchronization, 
+                             //when a user enters a chat and it becomes apparent that it is impossible 
+                             //to update user’s chat history completely. Chat history is kept only up to maximum of 400 
+                             //messages or 2 weeks. When a user has been offline past that limit, GAP_IN_CHAT notification is generated.
+        
+        SETROLE,             //when a chat member gets promoted or demoted.
+        KICKED,              //when a chat member gets kicked.
+        KICKBANNED,          //when a chat member gets banned.
+        SETOPTIONS,          //when chat options are changed.
+        SETPICTURE,          //when a chat member has changed the public chat topic picture. Added in protocol 7.     
+        SETGUIDELINES,       //when chat guidelines are changed.
+        JOINEDASAPPLICANT,   //when a new user joins the chat.
+        EMOTED,              // - result of /me message
+        UNKNOWN              //unknown message type, possibly due to connecting to Skype with older protocol.
     }
 
 	/**

@@ -895,7 +895,6 @@ public final class Skype {
 	
 	static void addGlobalChatListener(GlobalChatListener listener, Chat chat) throws SkypeException {
 		addGlobalChatListener(listener);
-		chatListenerManager.addManaged(chat);
 	}
 
     /**
