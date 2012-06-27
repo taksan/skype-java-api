@@ -481,7 +481,7 @@ public final class Profile {
      * @see <a href="http://en.wikipedia.org/wiki/ISO_3166-1">ISO 3166-1</a>
      */
     public void setCountryByISOCode(final String newValue) throws SkypeException {
-        setProperty("COUNTRY", Utils.convertNullToEmptyString(newValue) + " " + getCountry());
+        setProperty("COUNTRY", Utils.convertNullToEmptyString(newValue));
     }
 
     /**
