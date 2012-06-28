@@ -19,14 +19,19 @@ public class ChatMessageEditConnectorListener extends AbstractConnectorListener 
 
 	public void addListener(ChatMessageEditListener listener) {
 		listeners.add(listener);
-	}	
+	}
+	
+	public void removeListener(ChatMessageEditListener listener) {
+		listeners.remove(listener);
+	}
+
 	
 	public void messageReceived(ConnectorMessageEvent event) {
 		String message = event.getMessage();
 		processMessage(message);
 	}
 
-	void processMessage(String message) {
+	synchronized void processMessage(String message) {
 		String cmd = "CHATMESSAGE ";
 		if (!message.startsWith(cmd))
 			return;
@@ -54,14 +59,23 @@ public class ChatMessageEditConnectorListener extends AbstractConnectorListener 
 	}
 
 	private void processTimeStamp(ChatMessage chatMessage, String parameter) {
-		EditData editData = new EditData();
+		EditData editData = getEditData(chatMessage);
 		editData.eventDate = new Date(Integer.parseInt(parameter));
 		edits.put(chatMessage, editData);
 	}
 	
 	private void processAuthor(ChatMessage chatMessage, String parameter) {
-		EditData editData = edits.get(chatMessage);
+		EditData editData = getEditData(chatMessage);
 		editData.author = User.getInstance(parameter);
+	}
+
+	private EditData getEditData(ChatMessage chatMessage) {
+		EditData editData = edits.get(chatMessage);
+		if (editData == null) {
+			editData = new EditData();
+			edits.put(chatMessage, editData);
+		}
+		return editData;
 	}
 	
 	private void processBody(ChatMessage chatMessage, String parameter) {
@@ -70,10 +84,13 @@ public class ChatMessageEditConnectorListener extends AbstractConnectorListener 
 
 	private void fireEdit(ChatMessage chatMessage) {
 		EditData editData = edits.get(chatMessage);
+		if (editData == null)
+			return;
 		for (ChatMessageEditListener l : listeners) {
-			l.messageEdited(chatMessage, editData.eventDate, editData.author);
+			l.chatMessageEdited(chatMessage, editData.eventDate, editData.author);
 		}
 		edits.remove(chatMessage);
 	}
+
 
 }

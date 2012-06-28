@@ -18,7 +18,7 @@ public class ChatMessageEditConnectorListenerTest {
 		final AtomicReference<ChatMessage> actualEdited = new AtomicReference<ChatMessage>();
 		subject.addListener(new ChatMessageEditListener() {
 			@Override
-			public void messageEdited(ChatMessage editedMessage, Date when, User who) {
+			public void chatMessageEdited(ChatMessage editedMessage, Date when, User who) {
 				actualWhen.set(when);
 				actualWho.set(who);
 				actualEdited.set(editedMessage);

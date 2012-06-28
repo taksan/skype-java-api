@@ -773,22 +773,6 @@ public final class Skype {
         }
     }
     
-    public static void addChatEditListener(ChatMessageEditListener listener) throws SkypeException {
-    	Utils.checkNotNull("listener", listener);
-        synchronized (chatMessageEditListenerMutext) {
-            if (chatMessageEditConnectorListener == null) {
-            	chatMessageEditConnectorListener = new ChatMessageEditConnectorListener();
-                try {
-                    getConnectorInstance().addConnectorListener(chatMessageListener);
-                } catch (ConnectorException e) {
-                    Utils.convertToSkypeException(e);
-                }
-            }
-            chatMessageEditConnectorListener.addListener(listener);
-        }
-    }
-    
-
     /**
      * Remove a listener for CHATMESSAGE events.
      * If the listener is already removed nothing happens.
@@ -805,6 +789,42 @@ public final class Skype {
             }
         }
     }
+    
+    /**
+     * Add a listener for CHATMESSAGE events with EDITED_BY status received from the Skype API.
+     * @param listener the Listener to add.
+     * @throws SkypeException when connection has gone bad or ERROR reply.
+     * @see #removeChatMessageEditListener(ChatMessageEditListener)
+     */
+    public static void addChatMessageEditListener(ChatMessageEditListener listener) throws SkypeException {
+    	Utils.checkNotNull("listener", listener);
+        synchronized (chatMessageEditListenerMutext) {
+            if (chatMessageEditConnectorListener == null) {
+            	chatMessageEditConnectorListener = new ChatMessageEditConnectorListener();
+                try {
+                    getConnectorInstance().addConnectorListener(chatMessageEditConnectorListener);
+                } catch (ConnectorException e) {
+                    Utils.convertToSkypeException(e);
+                }
+            }
+            chatMessageEditConnectorListener.addListener(listener);
+        }
+    }
+    
+    /**
+     * Remove a listener for CHATMESSAGE with status EDITED_BY events.
+     * If the listener is already removed nothing happens.
+     * @param listener The listener to remove.
+     * @see #addChatMessageEditListener(ChatMessageEditListener)
+     */
+    public static void removeChatMessageEditListener(ChatMessageEditListener listener) throws SkypeException {
+    	Utils.checkNotNull("listener", listener);
+        synchronized (chatMessageEditListenerMutext) {
+            if (chatMessageEditConnectorListener != null) {
+            	chatMessageEditConnectorListener.removeListener(listener);
+            }
+        }
+    }    
 
     /**
      * Add a listener for CALL events received from the Skype API.
