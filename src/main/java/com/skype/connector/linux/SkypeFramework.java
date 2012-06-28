@@ -50,7 +50,6 @@ final class SkypeFramework {
     
     static void init() throws LoadLibraryException {
         synchronized(initializedFieldMutex) {
-//        	SkypeFramework.setDebugging(Skype.isDebuggingNativeLib);
             if (!initialized) {
             	if (SystemUtils.OS_ARCH.contains("64")) {
             		ConnectorUtils.loadLibrary(getLibName("x64"));
@@ -75,7 +74,7 @@ final class SkypeFramework {
     }
 
 	private static String getLibName(String arch) {
-		String libImpl = System.getProperty(SKYPE_API_LINUX_IMPL_PROPERTY, "x11");
+		String libImpl = System.getProperty(SKYPE_API_LINUX_IMPL_PROPERTY, "dbus");
 		return "skype_"+libImpl+"_"+arch;
 	}
     
