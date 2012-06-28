@@ -50,8 +50,12 @@ public final class Skype {
 
     /** chatMessageListener lock. */
     private static Object chatMessageListenerMutex = new Object();
+    
+    /** chatMessageEditListener lock. */
+    private static Object chatMessageEditListenerMutext = new Object();
+    
     /** CHATMESSAGE listener. */
-    private static ConnectorListener chatMessageListener;
+    private static ChatMessageConnectorListener chatMessageListener;
     /** Collection of listeners. */
     static List<ChatMessageListener> chatMessageListeners = new CopyOnWriteArrayList<ChatMessageListener>();
 
@@ -83,6 +87,8 @@ public final class Skype {
     };
     /** refrence to the default exception handler. */
     private static SkypeExceptionHandler exceptionHandler = defaultExceptionHandler;
+
+	private static ChatMessageEditConnectorListener chatMessageEditConnectorListener;
 
     /**
      * Sets the thread of Skype4Java to "daemon mode" or not.
@@ -764,6 +770,21 @@ public final class Skype {
                     Utils.convertToSkypeException(e);
                 }
             }
+        }
+    }
+    
+    public static void addChatEditListener(ChatMessageEditListener listener) throws SkypeException {
+    	Utils.checkNotNull("listener", listener);
+        synchronized (chatMessageEditListenerMutext) {
+            if (chatMessageEditConnectorListener == null) {
+            	chatMessageEditConnectorListener = new ChatMessageEditConnectorListener();
+                try {
+                    getConnectorInstance().addConnectorListener(chatMessageListener);
+                } catch (ConnectorException e) {
+                    Utils.convertToSkypeException(e);
+                }
+            }
+            chatMessageEditConnectorListener.addListener(listener);
         }
     }
     
