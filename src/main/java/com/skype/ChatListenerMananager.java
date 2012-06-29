@@ -24,19 +24,21 @@ public class ChatListenerMananager implements ChatMessageListener {
 		Chat chat = chatMessage.getChat();
 		Type type = chatMessage.getType();
 		switch(type){
-		case ADDEDMEMBERS:
-			User[] addedUsers = chatMessage.getAllUsers();
-			for (User user : addedUsers) {
-				fireChatUserAdded(chat, user);
-			}
-			break;
-		case LEFT:
-			LeaveReason leaveReason = chatMessage.getLeaveReason();
-			if (leaveReason.equals(LeaveReason.UNSUBSCRIBE)) {
-				User user = chatMessage.getSender();
-				fireChatUserLeft(chat, user);
-			}
-			break;
+			case ADDEDMEMBERS:
+				User[] addedUsers = chatMessage.getAllUsers();
+				for (User user : addedUsers) {
+					fireChatUserAdded(chat, user);
+				}
+				break;
+			case LEFT:
+				LeaveReason leaveReason = chatMessage.getLeaveReason();
+				if (leaveReason.equals(LeaveReason.UNSUBSCRIBE)) {
+					User user = chatMessage.getSender();
+					fireChatUserLeft(chat, user);
+				}
+				break;
+			default:
+				// do nothing
 		}
 	}
 

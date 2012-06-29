@@ -429,6 +429,8 @@ public final class VoiceMail extends SkypeObject {
                         case FAILED:
                             wait.notify();
                             break;
+                        default:
+                        	// do nothing
                     }
                 }
             }
