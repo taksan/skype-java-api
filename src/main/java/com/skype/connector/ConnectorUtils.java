@@ -348,8 +348,12 @@ public final class ConnectorUtils {
     	
     	try {
 	    	File skypeFramework = new File(libraryFile.getCanonicalFile().getParentFile(), "Skype.Framework");
-	    	InputStream skypeFrameworkStream = ConnectorUtils.class.getResourceAsStream("/"+"Skype.Framework");
-	    	writeStreamToFile(skypeFrameworkStream, skypeFramework);
+	    	
+	    	URL skypeFrameworkResourceUrl = ConnectorUtils.class.getResource("/"+"Skype.Framework");
+	    	if(!skypeFramework.getAbsolutePath().equals(skypeFrameworkResourceUrl.getPath())){
+	    		InputStream skypeFrameworkStream = ConnectorUtils.class.getResourceAsStream("/"+"Skype.Framework");
+	    		writeStreamToFile(skypeFrameworkStream, skypeFramework);
+	    	}
     	}
     	catch(IOException e) {
     		throw new IllegalStateException(e);
