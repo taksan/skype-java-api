@@ -501,8 +501,11 @@ public final class Profile {
      * @throws SkypeException when the connection has gone bad or an ERROR message is received.
      * @see #getCountry()
      */
-    public void setCountry(final String newValue) throws SkypeException {
-        setProperty("COUNTRY", getCountryByISOCode() + " " + Utils.convertNullToEmptyString(newValue));
+    public void setCountry(final String countryName) throws SkypeException {
+    	Utils.checkNotNull("countryName", countryName);
+    	String isoForCountry = CountryIsoByCountryName.getIsoForCountry(countryName);
+		Utils.checkNotNull("isoForCountry", isoForCountry);
+        setCountryByISOCode(isoForCountry);
     }
 
     /**
