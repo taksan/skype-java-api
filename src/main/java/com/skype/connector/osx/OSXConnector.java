@@ -60,10 +60,17 @@ public final class OSXConnector extends Connector {
         _skypeEventLoopEnabled = false;
     }
     
+    static String fixLegacyMessage(String message) {
+    	if (message.matches(".*\\bMESSAGE\\b.*")) {
+    		return message.replaceFirst("\\bMESSAGE\\b", "CHATMESSAGE");
+    	}
+    	return message;
+    }
+    
     private SkypeFrameworkListener listener = new AbstractSkypeFrameworkListener() {
         @Override
         public void notificationReceived(String notificationString) {
-            fireMessageReceived(notificationString);
+            fireMessageReceived(fixLegacyMessage(notificationString));
         }
     
         @Override
