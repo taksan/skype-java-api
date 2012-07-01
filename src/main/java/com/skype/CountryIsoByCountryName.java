@@ -9,7 +9,7 @@ public class CountryIsoByCountryName {
 	static {
 		String[] isoCountries = Locale.getISOCountries();
     	for (String countryIso : isoCountries) {
-			String displayCountry = new Locale("", countryIso).getDisplayCountry();
+			String displayCountry = new Locale("", countryIso).getDisplayCountry(new Locale("en_US"));
 			countryIsoByCountryName.put(displayCountry.toLowerCase(), countryIso.toLowerCase());
 		}
 	}

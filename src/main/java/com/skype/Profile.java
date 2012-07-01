@@ -496,7 +496,9 @@ public final class Profile {
     }
 
     /**
-     * Sets the country of the current user.
+     * Sets the country of the current user. The given country name must always be in english
+     * (to avoid locale problems).
+     * 
      * @param newValue the new country of the current user.
      * @throws SkypeException when the connection has gone bad or an ERROR message is received.
      * @see #getCountry()
