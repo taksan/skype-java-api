@@ -19,18 +19,13 @@
 # * 
 # * Contributors: 
 # * Gabriel Takeuchi - Makes both 32 bit and 64 bit dlls automatically
-# ********************************************************************
-# To build using this Makefile you just need mingw installed
- 
-all: x86 amd64
+# ******************************************************************************/
+# use NMAKE
+all: 
+	devenv skype.sln /build "Release|Win32"
+	devenv skype.sln /build "Release|x64"
+	move /y x86\skype_x86.dll ..\..\src\main\resources
+	move /y amd64\skype_amd64.dll ..\..\src\main\resources
 
-x86:
-	gcc -m32 -shared -I"${JAVA_HOME}"/include -I"${JAVA_HOME}"/include/win32 -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at	Win32Connector.cpp -o skype_x86.dll
-	cp skype_x86.dll ../../src/main/resources
-	
-amd64:
-	# TODO
-	
 clean:
-	rm -rf *.o *.dll	 
-	
+	del amd64 x86 skype.suo 
