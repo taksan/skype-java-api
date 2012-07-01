@@ -60,6 +60,11 @@ public class Win32Connector extends Connector {
     public static synchronized Connector getInstance() {
         if(instance == null) {
             instance = new Win32Connector();
+            try {
+				instance.initialize();
+			} catch (ConnectorException e) {
+				throw new IllegalStateException(e);
+			}
         }
         return (Connector) instance;
     }
@@ -87,7 +92,7 @@ public class Win32Connector extends Connector {
      * @param timeout maximum time in miliseconds to initialize.
      * @throws LoadLibraryException 
      */
-    protected void initializeImpl() {
+    protected void initializeImpl() {    	
         // Loading DLL
     	final String osArch = System.getProperty("os.arch");
     	String libfilename = String.format(LIB_FILENAME_FORMAT, osArch);
