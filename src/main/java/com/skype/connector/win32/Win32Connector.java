@@ -25,11 +25,10 @@
  ******************************************************************************/
 package com.skype.connector.win32;
 
-import java.io.File;
-
 import com.skype.connector.Connector;
 import com.skype.connector.ConnectorException;
 import com.skype.connector.ConnectorUtils;
+import com.skype.connector.LoadLibraryException;
 
 /**
  * Implementation of a connector for Windows.
@@ -86,23 +85,18 @@ public class Win32Connector extends Connector {
     /**
      * Initialize the connector.
      * @param timeout maximum time in miliseconds to initialize.
+     * @throws LoadLibraryException 
      */
     protected void initializeImpl() {
         // Loading DLL
+    	final String osArch = System.getProperty("os.arch");
+    	String libfilename = String.format(LIB_FILENAME_FORMAT, osArch);
     	try {
-    		System.loadLibrary("skype");
-    	} catch (Throwable e) {
-    		final String osArch = System.getProperty("os.arch");
-    		String libfilename = String.format(LIB_FILENAME_FORMAT, osArch);
-			if (!ConnectorUtils.checkLibraryInPath(libfilename)) {
-	    		ConnectorUtils.extractFromJarToTemp(libfilename);
-                String tmpDir = ConnectorUtils.getSkypeTempDir();
-                if (! tmpDir.endsWith(""+File.separatorChar)) {
-                    tmpDir = tmpDir+File.separatorChar;
-                }
-	    		System.load(tmpDir+libfilename);
-			}
-    	}
+			ConnectorUtils.loadLibrary(libfilename);
+		} catch (LoadLibraryException e) {
+			throw new IllegalStateException("It was impossible to load " + libfilename + " dll.", e);
+		}
+
         // Initializing JNI
         jni_init();
 
