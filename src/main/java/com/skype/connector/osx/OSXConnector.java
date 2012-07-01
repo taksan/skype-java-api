@@ -52,6 +52,11 @@ public final class OSXConnector extends Connector {
     	}
         if(_instance == null) {
             _instance = new OSXConnector();
+            try {
+				_instance.initialize();
+			} catch (ConnectorException e) {
+				throw new IllegalStateException(e);
+			}
         }
         return _instance;
     }
@@ -90,7 +95,6 @@ public final class OSXConnector extends Connector {
     }
     
     public boolean isRunning() throws ConnectorException {
-        ((OSXConnector)getInstance()).initialize();
         return SkypeFramework.isRunning();
     }
 
