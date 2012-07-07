@@ -75,7 +75,7 @@ final class SkypeFramework {
 
 	private static String getLibName(String arch) {
 		String libImpl = System.getProperty(SKYPE_API_LINUX_IMPL_PROPERTY, "dbus");
-		return "skype_"+libImpl+"_"+arch;
+		return "libskype_"+libImpl+"_"+arch+".so";
 	}
     
     private static native void setup0();
