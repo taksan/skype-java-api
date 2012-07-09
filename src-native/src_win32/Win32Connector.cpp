@@ -234,16 +234,19 @@ JNIEXPORT jstring JNICALL Java_com_skype_connector_win32_Win32Connector_jni_1get
 	wchar_t path[MAX_PATH];
 	DWORD dwBufLen = MAX_PATH -1;
 
-	RegOpenKeyExW( HKEY_LOCAL_MACHINE, L"Software\\Skype\\Phone",  0, KEY_QUERY_VALUE, &hKey );
+	int errorCode = RegOpenKeyExW( HKEY_LOCAL_MACHINE, L"Software\\Skype\\Phone",  0, KEY_QUERY_VALUE, &hKey );
+	
+	if (errorCode != ERROR_SUCCESS) {
+		RegCloseKey( hKey );
+		errorCode = RegOpenKeyExW( HKEY_CURRENT_USER, L"Software\\Skype\\Phone",  0, KEY_QUERY_VALUE, &hKey );
+	}
+	if (errorCode != ERROR_SUCCESS) {
+		RegCloseKey( hKey );
+		return env->NewStringUTF("");
+	}
+
 	RegQueryValueExW( hKey, L"SkypePath", NULL, NULL, (LPBYTE) path, &dwBufLen);
 	RegCloseKey( hKey );
 
-	if( dwBufLen == 0 ){
-		RegOpenKeyExW( HKEY_CURRENT_USER, L"Software\\Skype\\Phone",  0, KEY_QUERY_VALUE, &hKey );
-		RegQueryValueExW( hKey, L"SkypePath", NULL, NULL, (LPBYTE) path, &dwBufLen);
-		RegCloseKey( hKey );
-	}
-
-	return env->NewString( (const jchar*)path, dwBufLen );
-
+	return env->NewString( (const jchar*)path, dwBufLen/sizeof(wchar_t) );
 }
