@@ -40,4 +40,6 @@ To use the API you can add the following dependency to your maven project:
 	  <version>1.4</version>
 </dependency>
 
-There is also a shaded jar in the project download's repository.
+There is also a shaded jar, if you prefer:
+
+https://github.com/downloads/taksan/skype-java-api/skype-java-api-1.4.jar
