@@ -1,10 +1,38 @@
 This project is a mavenization and release of Skype4Java with several bug fixes.
 
-There are some usage samples in the following project:
+* 1.4 RELEASED
+
+Several bugfixes and a few features have been added to this version. 
+
+- Windows : 
+	- now the native library can be compiled using mingw, both under windows and linux. It is still possible to 
+compile using visual studio, but mingw compilation is preferred.
+	- a small bug in getInstaledPath function has been fixed.
+	- fixed native library extraction and loading
+
+- Mac OS : 
+	- fixed problems with getProfile and other functions that depended on deprecated MESSAGE object have been fixed.
+	- framework extraction fixed to work both from jar and eclipse
+
+- Linux : a major rewrite has been done. There are now two native implementations, the old one using X11 and a new one
+	using DBUS. The X11 version was very unstable and could even connect to a skype instance running on another user.
+	The default implementation is now DBUS, which prove much more stable on my tests. It is possible to use the old
+	implementation setting a system variable: "skype.api.impl" to x11
+
+Some new features have been added:
+
+- Chat.setGuidelines : can be used to change a set guidelines
+- Chat.addListener : allows registering a listener that will be triggered for users entering and leaving a chat
+- Skype.addChatEditListener : allows adding a listener that will be triggered when messages are edited
+
+Besides, the samples have been moved to its own project and a lot of refactorings have been to done to organize
+the code.
+
+The samples can be found on the following project:
 
 https://github.com/taksan/skype-api-samples
 
-The main idea is to use as a maven dependency, since it is deployed on maven central. To use it, just add the following to your pom.xml dependencies:
+To use the API you can add the following dependency to your maven project:
 
 <dependency>
 	  <groupId>com.github.taksan</groupId>
@@ -12,5 +40,4 @@ The main idea is to use as a maven dependency, since it is deployed on maven cen
 	  <version>1.4</version>
 </dependency>
 
-I'll make a shade jar release as well, which will make it possible to use it as a standalone version, but I strongly advise you to learn maven if you don't already know it, since it will be a lot easier to use this library.
-
+There is also a shaded jar in the project download's repository.
