@@ -55,7 +55,7 @@ final class SkypeFramework {
             		ConnectorUtils.loadLibrary(getLibName("x64"));
             	}
             	else {
-            		ConnectorUtils.loadLibrary(getLibName("skype_x86"));
+						ConnectorUtils.loadLibrary(getLibName("x86"));
             	}
                 setup0();
                 
