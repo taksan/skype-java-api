@@ -41,7 +41,7 @@ final class SkypeFramework {
         ConnectorUtils.checkNotNull("applicationName", applicationName);
         synchronized(initializedFieldMutex) {
             if (!initialized) {
-                ConnectorUtils.loadLibrary("skype");  
+                ConnectorUtils.loadLibrary("libskype.jnilib");  
                 setup0(applicationName);
                 initialized = true;                
             }
