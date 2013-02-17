@@ -7,11 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* Inaccessible static: initializedFieldMutex */
-/* Inaccessible static: initialized */
-/* Inaccessible static: listeners */
-/* Inaccessible static: sendCommandMutex */
-/* Inaccessible static: notificationReceivedMutex */
 /*
  * Class:     com_skype_connector_osx_SkypeFramework
  * Method:    setup0

@@ -8,9 +8,9 @@
  *
  */
 
-#include "SkypeAPI-Carbon.h"
+#import "SkypeAPI-Carbon.h"
 
 #ifdef __OBJC__
-	#include "SkypeAPI.h"
+	#import "SkypeAPI.h"
 #endif
 

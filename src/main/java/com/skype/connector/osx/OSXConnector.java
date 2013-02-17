@@ -43,13 +43,6 @@ public final class OSXConnector extends Connector {
      * @return instance.
      */
     public static synchronized Connector getInstance() {
-    	String osArch = System.getProperty("os.arch");
-		if (osArch.contains("64")) {
-    		throw new UnsupportedArchitectureException(
-    				"Skype Java Api doesn't support running under 64bit architectures under Mac OSX. " +
-    				"You may try running with 'java -d32' if your system has java 32bit installed."
-    				);
-    	}
         if(_instance == null) {
             _instance = new OSXConnector();
             try {

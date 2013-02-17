@@ -21,7 +21,7 @@
 # * Gabriel Takeuchi - Removed need for project builder and xcode, builds now just using "make"
 # ******************************************************************************/
 
-ARCH=-arch i386 -arch ppc 
+ARCH=-arch i386 -arch x86_64 
 CWD=.
 JNILib=$(CWD)/build/skype.build/Release/JNILib.build
 OBJS_NORMAL=$(JNILib)/Objects-normal/
@@ -29,7 +29,7 @@ DERIVED_SRCS=$(JNILib)/DerivedSources
 RELEASE_DIR=$(CWD)/build/Release
 
 OBJ=$(OBJS_NORMAL)/SkypeFramework.o
-CC=/Developer/usr/bin/gcc-4.2 
+CC=clang
 LINK_FILELIST=$(OBJS_NORMAL)/skype.LinkFileList
 CC_FLAGS=-fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -Os -Wunused-variable \
 	-Wmost -Wno-four-char-constants -Wno-unknown-pragmas
@@ -51,6 +51,7 @@ all: $(TARGET)
 
 $(TARGET): mkdirs $(OBJ)
 	$(CC) $(ARCH) -L$(RELEASE_DIR) $(F_DIR) -filelist $(LINK_FILELIST) $(FRAMEWORKS) $(INSTALL_FLAG) $(LD_FLAGS) -o $(TARGET)
+	install_name_tool -change "@executable_path/../Frameworks/Skype.framework/Versions/A/Skype" "@loader_path/Skype.Framework" $(TARGET)
 
 mkdirs: 
 	mkdir -p $(DERIVED_SRCS)

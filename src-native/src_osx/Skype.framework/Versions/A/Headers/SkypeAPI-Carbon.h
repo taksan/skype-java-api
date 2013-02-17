@@ -8,8 +8,8 @@
  *
  */
 
-#include <sys/cdefs.h>
-#include <Carbon/Carbon.h>
+#import <sys/cdefs.h>
+#import <Carbon/Carbon.h>
 
 __BEGIN_DECLS
 
