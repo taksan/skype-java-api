@@ -63,7 +63,36 @@ public class User extends SkypeObject {
     public static final String STATUS_PROPERTY = "status";
     /** Identifies the mood message property. */
     public static final String MOOD_TEXT_PROPERTY = "moodText";
-
+    /** Identifies the full name property. */
+    public static final String FULL_NAME = "fullName";
+    /** Identifies the phone mobile property. */
+    public static final String PHONE_MOBILE = "phoneMobile";
+    /** Identifies the phone home property. */
+    public static final String PHONE_HOME = "phoneHome";
+    /** Identifies the phone office property. */
+    public static final String PHONE_OFFICE = "phoneOffice";
+    /** Identifies the display name property. */
+    public static final String DISPLAYNAME = "displayname";
+    /** Identifies the country property. */
+    public static final String COUNTRY = "country";
+    /** Identifies the province property. */
+    public static final String PROVINCE = "province";
+    /** Identifies the city property. */
+    public static final String CITY = "city";
+    /** Identifies the time zone property. */
+    public static final String TIMEZONE = "timezone";
+    /** Identifies the sex property. */
+    public static final String SEX = "sex";
+    /** Identifies the home page property. */
+    public static final String HOMEPAGE = "homepage";
+    /** Identifies the birthday property. */
+    public static final String BIRTHDAY = "birthday";
+    /** Identifies the language property. */
+    public static final String LANGUAGE = "language";
+    /** Identifies the about property. */
+    public static final String ABOUT = "about";
+    
+    
     /**
      * Returns the User object by the specified id.
      * @param id whose associated User object is to be returned.
@@ -776,6 +805,34 @@ public class User extends SkypeObject {
                                 User.getInstance(skypeId).firePropertyChanged(STATUS_PROPERTY, null, Status.valueOf(propertyValue));
                             } else if (propertyName.equals("MOOD_TEXT")) {
                                 User.getInstance(skypeId).firePropertyChanged(MOOD_TEXT_PROPERTY, null, propertyValue);
+                            } else if (propertyName.equals("FULLNAME")) {
+                                User.getInstance(skypeId).firePropertyChanged(FULL_NAME, null, propertyValue);
+                            } else if (propertyName.equals("PHONE_MOBILE")) {
+                                User.getInstance(skypeId).firePropertyChanged(PHONE_MOBILE, null, propertyValue);
+                            } else if (propertyName.equals("PHONE_HOME")) {
+                                User.getInstance(skypeId).firePropertyChanged(PHONE_HOME, null, propertyValue);
+                            } else if (propertyName.equals("PHONE_OFFICE")) {
+                                User.getInstance(skypeId).firePropertyChanged(PHONE_OFFICE, null, propertyValue);
+                            } else if (propertyName.equals("DISPLAYNAME")) {
+                                User.getInstance(skypeId).firePropertyChanged(DISPLAYNAME, null, propertyValue);
+                            } else if (propertyName.equals("COUNTRY")) {
+                                User.getInstance(skypeId).firePropertyChanged(COUNTRY, null, propertyValue);
+                            } else if (propertyName.equals("PROVINCE")) {
+                                User.getInstance(skypeId).firePropertyChanged(PROVINCE, null, propertyValue);
+                            } else if (propertyName.equals("CITY")) {
+                                User.getInstance(skypeId).firePropertyChanged(CITY, null, propertyValue);
+                            } else if (propertyName.equals("TIMEZONE")) {
+                                User.getInstance(skypeId).firePropertyChanged(TIMEZONE, null, propertyValue);
+                            } else if (propertyName.equals("SEX")) {
+                                User.getInstance(skypeId).firePropertyChanged(SEX, null, propertyValue);
+                            } else if (propertyName.equals("HOMEPAGE")) {
+                                User.getInstance(skypeId).firePropertyChanged(HOMEPAGE, null, propertyValue);
+                            } else if (propertyName.equals("BIRTHDAY")) {
+                                User.getInstance(skypeId).firePropertyChanged(BIRTHDAY, null, propertyValue);
+                            } else if (propertyName.equals("LANGUAGE")) {
+                                User.getInstance(skypeId).firePropertyChanged(LANGUAGE, null, propertyValue);
+                            } else if (propertyName.equals("ABOUT")) {
+                                User.getInstance(skypeId).firePropertyChanged(ABOUT, null, propertyValue);
                             }
                         }
                     }
