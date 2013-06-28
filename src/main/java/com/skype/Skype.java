@@ -444,7 +444,51 @@ public final class Skype {
             return null;
         }
     }
+    
+    /**
+     * Find all FileTransfer of a certain type.
+     * @param type The type to search for.
+     * @return Array of found SMS messages.
+     * @throws SkypeException when connection has gone bad or ERROR reply.
+     */
+    private static FileTransfer[] getAllFileTransfers(String type) throws SkypeException {
+        try {
+            String command = "SEARCH " + type;
+            String responseHeader = "FILETRANSFERS ";
+            String response = getConnectorInstance().execute(command, responseHeader);
+            String data = response.substring(responseHeader.length());
+            String[] ids = Utils.convertToArray(data);
+            FileTransfer[] files = new FileTransfer[ids.length];
+            for (int i = 0; i < ids.length; ++i) {
+                files[i] = FileTransfer.getInstance(ids[i]);
+            }
+            return files;
+        } catch (ConnectorException e) {
+            Utils.convertToSkypeException(e);
+            return null;
+        }
+    }
 
+    /**
+     * Gets the list of all file transfer.
+     * @return a list of all file transfer.
+     * @throws SkypeException If there is a problem with the connection or state at the Skype client.
+     */
+    public static FileTransfer[] getAllFileTransfers() throws SkypeException {
+        return getAllFileTransfers("FILETRANSFERS");
+    }
+    
+    /**
+     * Gets the list of all file transfer.
+     * @return a list of currently active (ones that are nor COMPLETED, CANCELLED or FAILED) file transfer.
+     * Note that it is not necessary for remote users to accept the file transfer 
+     * for it to become listed in ACTIVEFILETRANSFERS for both parties.
+     * @throws SkypeException If there is a problem with the connection or state at the Skype client.
+     */
+    public static FileTransfer[] getAllActiveFileTransfers() throws SkypeException {
+        return getAllFileTransfers("ACTIVEFILETRANSFERS");
+    }
+    
     /**
      * Leave a voicemail in a other Skype users voicemailbox.
      * @param skypeId The Skype user to leave a voicemail.
