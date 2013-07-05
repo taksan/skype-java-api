@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 Fabio D. C. Depin.
+/*******************************************************************************
+ * Copyright 2013 Fabio D. C. Depin <fabiodepin@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,10 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ * 
+ * Contributors:
+ * Fabio D. C. Depin <fabiodepin@gmail.com> - initial implementation this Class
+ ******************************************************************************/
 package com.skype;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,10 +29,10 @@ import java.util.Map;
  * File transfer objects are for monitoring purposes only. 
  * No alters/actions via API are currently allowed with these objects. 
  * File transfers cannot be initiated nor accepted via API commands.
- * @see http://dev.skype.com/desktop-api-reference#OBJECT_FILETRANSFER
+ * @see <a http://dev.skype.com/desktop-api-reference#OBJECT_FILETRANSFER> Skype API reference - Objects - FILETRANSFER object</a>
  * @author Fábio D. C. Depin.
  */
-public class FileTransfer extends SkypeObject {
+public final class FileTransfer extends SkypeObject {
     /**
      * Collection of FileTransfer objects.
      */
@@ -42,6 +48,22 @@ public class FileTransfer extends SkypeObject {
             if (!files.containsKey(id)) {
                 FileTransfer file = new FileTransfer(id);
                 files.put(id, file);
+            }
+            return files.get(id);
+        }
+    }
+
+    /**
+     * Returns the FileTransfer object by the specified id.
+     *
+     * @param id whose associated FileTransfer object is to be returned.
+     * @param fileTransferListener the listener to add.
+     * @return Call object with ID == id.
+     */
+    static FileTransfer getInstance(final String id, final FileTransferListener fileTransferListener) {
+        synchronized (files) {
+            if (!files.containsKey(id)) {
+                files.put(id, new FileTransfer(id, fileTransferListener));
             }
             return files.get(id);
         }
@@ -168,7 +190,22 @@ public class FileTransfer extends SkypeObject {
      * ID of this FileTransfer object.
      */
     private final String id;
+    
+    /**
+     * List of listeners to FILETRANSFER objects.
+     */
+    private final List<FileTransferListener> listeners = Collections.synchronizedList(new ArrayList<FileTransferListener>());
 
+    /**
+     * Previous status.
+     */
+    private Status oldStatus;
+    
+    /**
+     * Exception handler to FILETRANSFER object.
+     */
+    private SkypeExceptionHandler exceptionHandler;
+    
     /**
      * Constructor, please use getFileTransfer() instead.
      * @param newId ID of this FileTransfer.
@@ -179,9 +216,23 @@ public class FileTransfer extends SkypeObject {
     }
     
     /**
+     * Consturctor. Use getInstance instead of constructor.
+     *
+     * @param newId the ID of this CALL object.
+     * @param callListener the monitor listener to add..
+     */
+    
+    private FileTransfer(final String newId, final FileTransferListener fileTransferListener) {
+        assert newId != null;
+        this.id = newId;
+        addFileTransferListener(fileTransferListener);
+    }
+    
+    /**
      * Overridden to provide ID as hashcode.
      * @return ID.
      */
+    @Override
     public final int hashCode() {
         return getId().hashCode();
     }
@@ -191,6 +242,7 @@ public class FileTransfer extends SkypeObject {
      * @param compared The object to compare to.
      * @return true when objects are equal.
      */
+    @Override
     public boolean equals(Object compared) {
         if (compared instanceof FileTransfer) {
             return getId().equals(((FileTransfer) compared).getId());
@@ -204,6 +256,48 @@ public class FileTransfer extends SkypeObject {
      */
     public String getId() {
         return id;
+    }
+    
+    /**
+     * Add a listener for field. The listener will be triggered every
+     * time the status of this FILETRANSFER object is changed.
+     *
+     * @param listener the listener to add.
+     */
+    public void addFileTransferListener(final FileTransferListener fileTransferListener) {
+        Utils.checkNotNull("listener", fileTransferListener);
+        listeners.add(fileTransferListener);
+    }
+
+    /**
+     * Remove a listener of this FILETRANSFER object. If listener is
+     * already removed nothing happens.
+     *
+     * @param listener the listener to remove.
+     */
+    public void removeCallMonitorListener(final FileTransferListener fileTransferListener) {
+        Utils.checkNotNull("listener", fileTransferListener);
+        listeners.remove(fileTransferListener);
+    }
+    
+    /**
+     * Trigger all Status listeners because the status of this FILETRANSFER object has
+     * changed.
+     *
+     * @param status the new status.
+     */
+    void fireFileTransfer(final Status status) {
+        if (status == oldStatus) {
+            return;
+        }
+        oldStatus = status;
+        for (FileTransferListener listener : listeners) {
+            try {
+                listener.fileTransferMonitor(this, status);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
     }
     
     /**

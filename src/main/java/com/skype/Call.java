@@ -19,6 +19,7 @@
  * Contributors:
  * Koji Hisano - initial API and implementation
  * Bart Lamot - good javadocs
+ * Fabio D. C. Depin <fabiodepin@gmail.com> - continued implementation API 
  ******************************************************************************/
 package com.skype;
 
@@ -35,10 +36,8 @@ import com.skype.connector.ConnectorException;
 
 /**
  * This class implements all features of the SKYPE CALL protocol.
- * @see <a href="https://developer.skype.com/Docs/ApiDoc/Making_and_managing_voice_calls">Skype API reference - Commands - Making and managing voice calls</a>
- * @see <a href="https://developer.skype.com/Docs/ApiDoc/Making_and_managing_video_calls">Skype API reference - Commands - Making and managing video calls</a>
- * @see <a href="https://developer.skype.com/Docs/ApiDoc/CALL_object">Skype API reference - Objects - CALL object</a>
- * @see <a href="https://developer.skype.com/Docs/ApiDoc/Call_notifications">Skype API reference - Notifications - Object notifications - Call notifications</a>
+ * @see <a href="https://dev.skype.com/desktop-api-reference#Video"> Skype API reference - Commands - Making and managing voice calls</a>
+ * @see <a href="https://dev.skype.com/desktop-api-reference#OBJECT_CALL"> Skype API reference - Objects - CALL object</a>
  * @author Koji Hisano
  */
 public final class Call extends SkypeObject {
@@ -49,6 +48,7 @@ public final class Call extends SkypeObject {
     
     /**
      * Returns the Call object by the specified id.
+     *
      * @param id whose associated Call object is to be returned.
      * @return Call object with ID == id.
      */
@@ -61,9 +61,25 @@ public final class Call extends SkypeObject {
         }
     }
 
-	/**
-	 * Enumeration of call status types.
-	 */
+    /**
+     * Returns the Call object by the specified id.
+     *
+     * @param id whose associated Call object is to be returned.
+     * @param callListener the listener to add.
+     * @return Call object with ID == id.
+     */
+    static Call getInstance(final String id, final CallMonitorListener callListener) {
+        synchronized (calls) {
+            if (!calls.containsKey(id)) {
+                calls.put(id, new Call(id, callListener));
+            }
+            return calls.get(id);
+        }
+    }
+    
+    /**
+     * Enumeration of call status types.
+     */
     public enum Status {
     	/**
     	 * UNPLACED - call was never placed.
@@ -90,7 +106,11 @@ public final class Call extends SkypeObject {
     	 * WAITING_REDIAL_COMMAND - call to PSTN was rejected by remote party.
     	 * REDIAL_PENDING - redial button on the Call Phones tab of the Skype interface is pressed.
     	 */
-        UNPLACED, ROUTING, EARLYMEDIA, FAILED, RINGING, INPROGRESS, ONHOLD, FINISHED, MISSED, REFUSED, BUSY, CANCELLED, VM_BUFFERING_GREETING, VM_PLAYING_GREETING, VM_RECORDING, VM_UPLOADING, VM_SENT, VM_CANCELLED, VM_FAILED, TRANSFERRING, TRANSFERRED, LOCALHOLD, REMOTEHOLD, WAITING_REDIAL_COMMAND, REDIAL_PENDING
+        UNPLACED, ROUTING, EARLYMEDIA, FAILED, RINGING, INPROGRESS, ONHOLD, 
+        FINISHED, MISSED, REFUSED, BUSY, CANCELLED, VM_BUFFERING_GREETING, 
+        VM_PLAYING_GREETING, VM_RECORDING, VM_UPLOADING, VM_SENT, VM_CANCELLED, 
+        VM_FAILED, TRANSFERRING, TRANSFERRED, LOCALHOLD, REMOTEHOLD, 
+        WAITING_REDIAL_COMMAND, REDIAL_PENDING;
     }
 
     /**
@@ -164,7 +184,13 @@ public final class Call extends SkypeObject {
     /**
      * List of listeners to CALL objects.
      */
+    @Deprecated
     private final List<CallStatusChangedListener> listeners = Collections.synchronizedList(new ArrayList<CallStatusChangedListener>());
+    
+    /**
+     * List of monitor listeners to CALL objects.
+     */
+    private final List<CallMonitorListener> monitorListeners = Collections.synchronizedList(new ArrayList<CallMonitorListener>());
     
     /**
      * Previous status.
@@ -182,8 +208,8 @@ public final class Call extends SkypeObject {
     private boolean isCallListenerEventFired;
 
     /**
-     * Consturctor.
-     * Use getInstance instead of constructor.
+     * Consturctor. Use getInstance instead of constructor.
+     *
      * @param newId the ID of this CALL object.
      */
     private Call(final String newId) {
@@ -191,9 +217,22 @@ public final class Call extends SkypeObject {
     }
 
     /**
+     * Consturctor. Use getInstance instead of constructor.
+     *
+     * @param newId the ID of this CALL object.
+     * @param callListener the monitor listener to add..
+     */
+    
+    private Call(final String newId, final CallMonitorListener callListener) {
+        this.id = newId;
+        addCallMonitorListener(callListener);
+    }
+    
+    /**
      * Use the CALL ID as the hashcode.
      * @return id.
      */
+    @Override
     public int hashCode() {
         return id.hashCode();
     }
@@ -204,6 +243,7 @@ public final class Call extends SkypeObject {
      * @param compared the object to compare to.
      * @return true if objects are equal.
      */
+    @Override
     public boolean equals(final Object compared) {
         if (compared instanceof Call) {
             return id.equals(((Call) compared).id);
@@ -220,10 +260,53 @@ public final class Call extends SkypeObject {
     }
 
     /**
+     * Add a listener for the monitor field. The listener will be triggered every
+     * time the status of this CALL object is changed.
+     *
+     * @param listener the listener to add.
+     */
+    public void addCallMonitorListener(final CallMonitorListener callListener) {
+        Utils.checkNotNull("listener", callListener);
+        monitorListeners.add(callListener);
+    }
+
+    /**
+     * Remove a listener to the monitor of this CALL object. If listener is
+     * already removed nothing happens.
+     *
+     * @param listener the listener to remove.
+     */
+    public void removeCallMonitorListener(final CallMonitorListener callListener) {
+        Utils.checkNotNull("listener", callListener);
+        monitorListeners.remove(callListener);
+    }
+    
+    /**
+     * Trigger all Status listeners because the status of this CALL object has
+     * changed.
+     *
+     * @param status the new status.
+     */
+    void fireCallMonitor(final Status status) {
+        if (status == oldStatus) {
+            return;
+        }
+        oldStatus = status;
+        for (CallMonitorListener listener : monitorListeners) {
+            try {
+                listener.callMonitor(this, status);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
      * Add a listener for the Status field.
      * The listener will be triggered every time the status of this CALL object is changed.
      * @param listener the listener to add.
      */
+    @Deprecated
     public void addCallStatusChangedListener(final CallStatusChangedListener listener) {
         Utils.checkNotNull("listener", listener);
         listeners.add(listener);
@@ -234,6 +317,7 @@ public final class Call extends SkypeObject {
      * If listener is already removed nothing happens.
      * @param listener the listener to remove.
      */
+    @Deprecated
     public void removeCallStatusChangedListener(final CallStatusChangedListener listener) {
         Utils.checkNotNull("listener", listener);
         listeners.remove(listener);
@@ -243,13 +327,14 @@ public final class Call extends SkypeObject {
      * Trigger all Status listeners because the status of this CALL object has changed.
      * @param status the new status.
      */
+    @Deprecated
     void fireStatusChanged(final Status status) {
-        CallStatusChangedListener[] listeners = this.listeners.toArray(new CallStatusChangedListener[0]);
+        CallStatusChangedListener[] callListeners = this.listeners.toArray(new CallStatusChangedListener[0]);
         if (status == oldStatus) {
             return;
         }
         oldStatus = status;
-        for (CallStatusChangedListener listener : listeners) {
+        for (CallStatusChangedListener listener : callListeners) {
             try {
                 listener.statusChanged(status);
             } catch (Throwable e) {
