@@ -19,6 +19,7 @@
  * Contributors:
  * Koji Hisano - initial API and implementation
  * Bart Lamot - good ideas for API and initial javadoc
+ * Fabio D. C. Depin <fabiodepin@gmail.com> - continued implementation API 
  ******************************************************************************/
 package com.skype;
 
@@ -49,32 +50,46 @@ public final class Skype {
     private static Profile profile;
 
     /** chatMessageListener lock. */
-    private static Object chatMessageListenerMutex = new Object();
+    private final static Object chatMessageListenerMutex = new Object();
     
     /** chatMessageEditListener lock. */
-    private static Object chatMessageEditListenerMutext = new Object();
+    private final static Object chatMessageEditListenerMutext = new Object();
+    
+    /** fileTransferListener lock. */
+    private final static Object fileTransferListenerMutex = new Object();
+    /** FILETRANSFER listener. */
+    private static FileTransferConnectorListener fileTransferListener;
+    /** Collection of listeners. */
+    static List<FileTransferListener> fileTransferListeners = new CopyOnWriteArrayList<FileTransferListener>();
     
     /** CHATMESSAGE listener. */
     private static ChatMessageConnectorListener chatMessageListener;
     /** Collection of listeners. */
     static List<ChatMessageListener> chatMessageListeners = new CopyOnWriteArrayList<ChatMessageListener>();
 
+    /** callMonitorListener lock object. */
+    private final static Object callMonitorListenerMutex = new Object();
+    /** CALL monitor listener. */
+    private static ConnectorListener callMonitorListener;
+    /** Collection of all CALL monitor listeners. */
+    static List<CallMonitorListener> callMonitorListeners = new CopyOnWriteArrayList<CallMonitorListener>();
+    
     /** callListener lock object. */
-    private static Object callListenerMutex = new Object();
+    private final static Object callListenerMutex = new Object();
     /** CALL listener. */
     private static ConnectorListener callListener;
     /** Collection of all CALL listeners. */
     static List<CallListener> callListeners = new CopyOnWriteArrayList<CallListener>();
 
     /** voiceMailListener lock object. */
-    private static Object voiceMailListenerMutex = new Object();
+    private final static Object voiceMailListenerMutex = new Object();
     /** VOICEMAIL listener. */
     private static ConnectorListener voiceMailListener;
     /** Collection of all VOICEMAIL listeners. */
     static List<VoiceMailListener> voiceMailListeners = new CopyOnWriteArrayList<VoiceMailListener>();
 
     /** User threading lock object. */
-    private static Object userThreadFieldMutex = new Object();
+    private final static Object userThreadFieldMutex = new Object();
     /** User thread. */
     private static Thread userThread;
 
@@ -88,7 +103,7 @@ public final class Skype {
     /** refrence to the default exception handler. */
     private static SkypeExceptionHandler exceptionHandler = defaultExceptionHandler;
 
-	private static ChatMessageEditConnectorListener chatMessageEditConnectorListener;
+    private static ChatMessageEditConnectorListener chatMessageEditConnectorListener;
 
     /**
      * Sets the thread of Skype4Java to "daemon mode" or not.
@@ -796,7 +811,7 @@ public final class Skype {
         return User.getInstance(id);
     }
 
-    /**
+        /**
      * Add a listener for CHATMESSAGE events received from the Skype API.
      * @param listener the Listener to add.
      * @throws SkypeException when connection has gone bad or ERROR reply.
@@ -833,7 +848,7 @@ public final class Skype {
             }
         }
     }
-    
+
     /**
      * Add a listener for CHATMESSAGE events with EDITED_BY status received from the Skype API.
      * @param listener the Listener to add.
@@ -868,14 +883,109 @@ public final class Skype {
             	chatMessageEditConnectorListener.removeListener(listener);
             }
         }
-    }    
+    }
 
+    /**
+     * Add a listener for FILETRANSFER events received from the Skype API.
+     *
+     * @see FileTransferListener
+     * @param listener the listener to add.
+     * @throws SkypeException when connection has gone bad or ERROR reply.
+     */
+    public static void addFileTransferListener(FileTransferListener listener) throws SkypeException {
+        Utils.checkNotNull("listener", listener);
+        synchronized (fileTransferListenerMutex) {
+            boolean success = false;
+            try {
+                fileTransferListeners.add(listener);
+                if (fileTransferListener == null) {
+                    fileTransferListener = new FileTransferConnectorListener(listener);
+                    try {
+                        getConnectorInstance().addConnectorListener(fileTransferListener);
+                    } catch (ConnectorException e) {
+                        Utils.convertToSkypeException(e);
+                    }
+                }
+                success = true;
+            } finally {
+                if (!success) {
+                    fileTransferListeners.remove(listener);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Remove a listener for FILETRANSFER events.
+     * If listener is already removed nothing happens.
+     * @param listener The listener to add.
+     */
+    public static void removeFileTransferListener(FileTransferListener listener) {
+        Utils.checkNotNull("listener", listener);
+        synchronized (fileTransferListenerMutex) {
+            fileTransferListeners.remove(listener);
+            if (fileTransferListeners.isEmpty()) {
+            	if (fileTransferListener != null)
+            		getConnectorInstance().removeConnectorListener(fileTransferListener);
+                fileTransferListener = null;
+            }
+        }
+    }
+    
+    /**
+     * Add a listener for CALL events received from the Skype API.
+     *
+     * @see CallListener
+     * @param listener the listener to add.
+     * @throws SkypeException when connection has gone bad or ERROR reply.
+     */
+    public static void addCallMonitorListener(CallMonitorListener listener) throws SkypeException {
+        Utils.checkNotNull("listener", listener);
+        synchronized (callMonitorListenerMutex) {
+            boolean success = false;
+            try {
+                callMonitorListeners.add(listener);
+                if (callMonitorListener == null) {
+                    callMonitorListener = new CallConnectorListener(listener);
+                    try {
+                        getConnectorInstance().addConnectorListener(callMonitorListener);
+                    } catch (ConnectorException e) {
+                        Utils.convertToSkypeException(e);
+                    }
+                }
+                success = true;
+            } finally {
+                if (!success) {
+                    callMonitorListeners.remove(listener);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Remove a listener for CALL events.
+     * If listener is already removed nothing happens.
+     * @param listener The listener to add.
+     */
+    public static void removeCallMonitorListener(CallMonitorListener listener) {
+        Utils.checkNotNull("listener", listener);
+        synchronized (callMonitorListenerMutex) {
+            callMonitorListeners.remove(listener);
+            if (callMonitorListeners.isEmpty()) {
+            	if (callMonitorListener != null)
+            		getConnectorInstance().removeConnectorListener(callMonitorListener);
+                callMonitorListener = null;
+            }
+        }
+    }
+    
     /**
      * Add a listener for CALL events received from the Skype API.
      * @see CallListener
      * @param listener the listener to add.
      * @throws SkypeException when connection has gone bad or ERROR reply.
      */
+    @Deprecated
     public static void addCallListener(CallListener listener) throws SkypeException {
         Utils.checkNotNull("listener", listener);
         synchronized (callListenerMutex) {
@@ -901,6 +1011,7 @@ public final class Skype {
         }
     }
     
+    @Deprecated
     public static boolean isCallListenerRegistered(CallListener listener) {
     	return callListeners.contains(listener);
     }
@@ -910,6 +1021,7 @@ public final class Skype {
      * If listener is already removed nothing happens.
      * @param listener The listener to add.
      */
+    @Deprecated
     public static void removeCallListener(CallListener listener) {
         Utils.checkNotNull("listener", listener);
         synchronized (callListenerMutex) {
@@ -960,16 +1072,17 @@ public final class Skype {
     }
     
     static Object chatListenerManagerMutex = new Object();
-	static ChatListenerMananager chatListenerManager = null;
-	public static void addGlobalChatListener(GlobalChatListener listener) throws SkypeException {
+    static ChatListenerMananager chatListenerManager = null;
+
+    public static void addGlobalChatListener(GlobalChatListener listener) throws SkypeException {
 		synchronized (chatListenerManagerMutex ) {
-			if (chatListenerManager == null) {
-				chatListenerManager = new ChatListenerMananager();
-				addChatMessageListener(chatListenerManager);
-			}
-			chatListenerManager.addGlobalChatListener(listener);
-		}
-	}
+            if (chatListenerManager == null) {
+                chatListenerManager = new ChatListenerMananager();
+                addChatMessageListener(chatListenerManager);
+            }
+            chatListenerManager.addGlobalChatListener(listener);
+        }
+    }
 	
 	public static void removeGlobalChatListener(GlobalChatListener listener) {
 		synchronized (chatListenerManager) {
