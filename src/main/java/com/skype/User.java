@@ -18,6 +18,7 @@
  * 
  * Contributors:
  * Koji Hisano - initial API and implementation
+ * Fabio D. C. Depin <fabiodepin@gmail.com> - continued implementation API
  ******************************************************************************/
 package com.skype;
 
@@ -49,6 +50,9 @@ import com.skype.connector.ConnectorMessageEvent;
  * For example, you can show the full name of the 'echo123' user by this code:
  * <pre>System.out.println(new User("echo123").getFullName());</pre>
  * </p>
+ * 
+ * This class implements all features of the SKYPE USER protocol.
+ * @see <a https://dev.skype.com/desktop-api-reference#OBJECT_USER> Skype API reference - Objects - USER object</a>
  */
 public class User extends SkypeObject {
     /**
