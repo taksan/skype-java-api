@@ -29,7 +29,7 @@ SOURCES = SkypeFramework.c SkypeService.c Logging.c
 .SECONDEXPANSION:
 
 LIBS = $(shell pkg-config --libs dbus-1 dbus-glib-1)
-LIBS_32=$(shell pkg-config --libs dbus-1 dbus-glib-1)
+LIBS_32= -L/usr/lib32/i386-linux-gnu $(shell pkg-config --libs dbus-1 dbus-glib-1)
 
 all: $(X64) $(X86)
 

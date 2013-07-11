@@ -1,4 +1,4 @@
-JDK_DIR = /usr/lib/jvm/java-6-openjdk/
+JDK_DIR = /usr/lib/jvm/java-6-openjdk-amd64/
 CC = gcc
 CFLAGS = -Wall -pipe -g -fPIC -I../commons 
 INCPATH = -I. -I$(JDK_DIR)/include -I$(JDK_DIR)/include/linux

@@ -4,5 +4,14 @@ libdbus-glib-1-dev
 libdbus-1-dev
 libgobject-2.0.so
 libglib2.0-0
-
+libc6-dev-i386
+g++-multilib
+getlibs -l libdbus-glib-1.so
+getlibs -l libdbus-1.so
+getlibs -l libgobject-2.0.so
+getlibs -l libglib-2.0.so
+getlibs -l libdbus-glib-1.a
+getlibs -l libdbus-1.a
+getlibs -l libgobject-2.0.a
+getlibs -l libglib-2.0.a
 
