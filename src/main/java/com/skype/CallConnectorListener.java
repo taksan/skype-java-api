@@ -54,7 +54,8 @@ public class CallConnectorListener extends AbstractConnectorListener {
                     Call call = Call.getInstance(id);
                 }
                 EXIT:
-                if (status == Call.Status.FINISHED || status == Call.Status.CANCELLED || status == Call.Status.FAILED){
+                if (status == Call.Status.FINISHED || status == Call.Status.CANCELLED ||
+                        status == Call.Status.FAILED || status == Call.Status.MISSED){
                     break EXIT;
                 }
             }
