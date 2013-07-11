@@ -18,6 +18,7 @@
  * 
  * Contributors:
  * Koji Hisano - initial API and implementation
+ * Fabio D. C. Depin <fabiodepin@gmail.com> - continued implementation API 
  ******************************************************************************/
 package com.skype;
 
@@ -63,41 +64,17 @@ public final class Profile {
      */
     public enum Status {
         /**
-         * The <code>UNKNOWN</code> constant indicates the user status is unknown.
+         * The <code>UNKNOWN</code> no status information for current user.
+         * The <code>ONLINE</code> current user is online.
+         * The <code>OFFLINE</code> current user is offline.
+         * The <code>SKYPEME</code> current user is in “Skype Me” mode (Protocol 2).
+         * The <code>AWAY</code> current user is away.
+         * The <code>NA</code> current user is not available.
+         * The <code>DND</code> current user is in “Do not disturb” mode.
+         * The <code>INVISIBLE</code> current user is invisible to others.
+         * The <code>LOGGEDOUT</code> current user is logged out. Clients are detached.
          */
-        UNKNOWN,
-        /**
-         * The <code>ONLINE</code> constant indicates the user is online.
-         */
-        ONLINE,
-        /**
-         * The <code>OFFLINE</code> constant indicates the user is offline.
-         */
-        OFFLINE,
-        /**
-         * The <code>SKYPEME</code> constant indicates the user is in SkypeMe mode.
-         */
-        SKYPEME,
-        /**
-         * The <code>AWAY</code> constant indicates the user is away.
-         */
-        AWAY,
-        /**
-         * The <code>NA</code> constant indicates the user is not available.
-         */
-        NA,
-        /**
-         * The <code>DND</code> constant indicates the user is in do not disturb mode.
-         */
-        DND,
-        /**
-         * The <code>INVISIBLE</code> constant indicates the user is invisible to others.
-         */
-        INVISIBLE,
-        /**
-         * The <code>LOGGEDOUT</code> constant indicates the user is logged out.
-         */
-        LOGGEDOUT;
+        UNKNOWN, ONLINE, OFFLINE, SKYPEME, AWAY, NA, DND, INVISIBLE, LOGGEDOUT;
     }
 
     /**
@@ -108,16 +85,10 @@ public final class Profile {
     public enum Sex {
         /**
          * The <code>UNKNOWN</code> constant indicates the sex of the current user is unknown.
-         */
-        UNKNOWN,
-        /**
          * The <code>MALE</code> constant indicates the current user is male.
-         */
-        MALE,
-        /**
          * The <code>FEMALE</code> constant indicates the current user is female.
          */
-        FEMALE;
+        UNKNOWN, MALE, FEMALE;
     }
 
     /**
@@ -199,7 +170,7 @@ public final class Profile {
     }
     
     private PropertyChangeSupport listeners = new PropertyChangeSupport(this);
-    private Object propertyChangeListenerMutex = new Object();
+    private final Object propertyChangeListenerMutex = new Object();
     private ConnectorListener propertyChangeListener;
 
     /**

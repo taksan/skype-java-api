@@ -62,6 +62,13 @@ public final class Skype {
     /** Collection of listeners. */
     static List<FileTransferListener> fileTransferListeners = new CopyOnWriteArrayList<FileTransferListener>();
     
+    /** userListener lock. */
+    private final static Object userListenerMutex = new Object();
+    /** USER listener. */
+    private static UserConnectorListener userListener;
+    /** Collection of listeners. */
+    static List<UserListener> userListeners = new CopyOnWriteArrayList<UserListener>();
+    
     /** CHATMESSAGE listener. */
     private static ChatMessageConnectorListener chatMessageListener;
     /** Collection of listeners. */
@@ -933,6 +940,53 @@ public final class Skype {
     }
     
     /**
+     * Add a listener for USER events received from the Skype API.
+     *
+     * @see UserListener
+     * @param listener the listener to add.
+     * @throws SkypeException when connection has gone bad or ERROR reply.
+     */
+    public static void addUserListener(UserListener listener) throws SkypeException {
+        Utils.checkNotNull("listener", listener);
+        synchronized (userListenerMutex) {
+            boolean success = false;
+            try {
+                userListeners.add(listener);
+                if (userListener == null) {
+                    userListener = new UserConnectorListener(listener);
+                    try {
+                        getConnectorInstance().addConnectorListener(userListener);
+                    } catch (ConnectorException e) {
+                        Utils.convertToSkypeException(e);
+                    }
+                }
+                success = true;
+            } finally {
+                if (!success) {
+                    userListeners.remove(listener);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Remove a listener for USER events.
+     * If listener is already removed nothing happens.
+     * @param listener The listener to add.
+     */
+    public static void removeUserListener(UserListener listener) {
+        Utils.checkNotNull("listener", listener);
+        synchronized (userListenerMutex) {
+            userListeners.remove(listener);
+            if (userListeners.isEmpty()) {
+            	if (userListener != null)
+                    getConnectorInstance().removeConnectorListener(userListener);
+                userListener = null;
+            }
+        }
+    }
+
+    /**
      * Add a listener for CALL events received from the Skype API.
      *
      * @see CallListener
@@ -1071,7 +1125,7 @@ public final class Skype {
         }
     }
     
-    static Object chatListenerManagerMutex = new Object();
+    static final Object chatListenerManagerMutex = new Object();
     static ChatListenerMananager chatListenerManager = null;
 
     public static void addGlobalChatListener(GlobalChatListener listener) throws SkypeException {
@@ -1084,16 +1138,17 @@ public final class Skype {
         }
     }
 	
-	public static void removeGlobalChatListener(GlobalChatListener listener) {
-		synchronized (chatListenerManager) {
-			if (chatListenerManager == null) return;
-			chatListenerManager.addGlobalChatListener(listener);
-		}
-	}
+    public static void removeGlobalChatListener(GlobalChatListener listener) {
+        synchronized (chatListenerManagerMutex) {
+            if (chatListenerManager != null){
+                chatListenerManager.removeListener(listener);
+            }
+        }
+    }
 	
-	static void addGlobalChatListener(GlobalChatListener listener, Chat chat) throws SkypeException {
-		addGlobalChatListener(listener);
-	}
+    static void addGlobalChatListener(GlobalChatListener listener, Chat chat) throws SkypeException {
+        addGlobalChatListener(listener);
+    }
 
     /**
      * Use another exceptionhandler then the default one.
@@ -1121,12 +1176,12 @@ public final class Skype {
 
     static Connector replacementConnectorInstance = null;
 
-	public static boolean isDebuggingNativeLib;
-	private static Connector getConnectorInstance() {
-		if (replacementConnectorInstance == null)
-			return Connector.getInstance();
-		return replacementConnectorInstance;
-	}    
+    public static boolean isDebuggingNativeLib;
+    private static Connector getConnectorInstance() {
+        if (replacementConnectorInstance == null)
+            return Connector.getInstance();
+        return replacementConnectorInstance;
+    }    
 
     /** 
      * Private constructor.
@@ -1135,7 +1190,7 @@ public final class Skype {
     private Skype() {
     }
 
-	public static void setDebugNative(boolean b) {
-		isDebuggingNativeLib = b;
-	}
+    public static void setDebugNative(boolean b) {
+        isDebuggingNativeLib = b;
+    }
 }

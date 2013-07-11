@@ -43,6 +43,7 @@ import com.skype.connector.Connector;
 import com.skype.connector.ConnectorException;
 import com.skype.connector.ConnectorListener;
 import com.skype.connector.ConnectorMessageEvent;
+import java.util.ArrayList;
 
 /**
  * The <code>User</code> class contains the skype user's information.
@@ -60,7 +61,7 @@ public class User extends SkypeObject {
      */
     private static final Map<String, User> users = new HashMap<String, User>();
     
-    private static Object propertyChangeListenerMutex = new Object();
+    private static final Object propertyChangeListenerMutex = new Object();
     private static ConnectorListener propertyChangeListener;
     
     /** Identifies the status property. */
@@ -96,6 +97,42 @@ public class User extends SkypeObject {
     /** Identifies the about property. */
     public static final String ABOUT = "about";
     
+    /** Previous status. */
+    private Status oldStatus;
+    /** Previous sex. */
+    private Sex oldSex;
+    /** Previous mood text. */
+    private String oldMoodText;
+    /** Previous full name. */
+    private String oldFullName;
+    /** Previous phone mobile. */
+    private String oldPhoneMobile;
+    /** Previous phone home. */
+    private String oldPhoneHome;
+    /** Previous phone office. */
+    private String oldPhoneOffice;
+    /** Previous display name. */
+    private String oldDisplayName;
+    /** Previous country. */
+    private String oldCountry;
+    /** Previous province. */
+    private String oldProvince;
+    /** Previous city. */
+    private String oldCity;
+    /** Previous time zone. */
+    private String oldTimeZone;
+    /** Previous home page. */
+    private String oldHomePage;
+    /** Previous birthday. */
+    private String oldBirthday;
+    /** Previous language. */
+    private String oldLanguage;
+    /** Previous about. */
+    private String oldAbout;
+    /** Previous blocked state. */
+    private boolean oldIsBlocked;
+    /** Previous authorized state. */
+    private boolean oldIsAuthorized;
     
     /**
      * Returns the User object by the specified id.
@@ -110,6 +147,24 @@ public class User extends SkypeObject {
             return users.get(id);
         }
     }
+    
+    /**
+     * Returns the User object by the specified id.
+     *
+     * @param id whose associated User object is to be returned.
+     * @param userListener the listener to add.
+     * @return User object with ID == id.
+     */
+    public static User getInstance(final String id, final UserListener userListener) {
+        synchronized (users) {
+            if (!users.containsKey(id)) {
+                users.put(id, new User(id, userListener));
+            } else {
+                addUserListener(userListener);
+            }
+            return users.get(id);
+        }
+    }    
     
     /**
      * Returns the Friend object by the specified id.
@@ -142,37 +197,17 @@ public class User extends SkypeObject {
      */
     public enum Status {
         /**
-         * The <code>UNKNOWN</code> constant indicates the skype user status is unknown.
+         * The <code>UNKNOWN</code> no status information for current user.
+         * The <code>ONLINE</code> current user is online.
+         * The <code>OFFLINE</code> current user is offline.
+         * The <code>SKYPEME</code> current user is in “Skype Me” mode (Protocol 2).
+         * The <code>AWAY</code> current user is away.
+         * The <code>NA</code> current user is not available.
+         * The <code>DND</code> current user is in “Do not disturb” mode.
+         * The <code>INVISIBLE</code> current user is invisible to others.
+         * The <code>LOGGEDOUT</code> current user is logged out. Clients are detached.
          */
-        UNKNOWN,
-        /**
-         * The <code>OFFLINE</code> constant indicates the skype user is offline.
-         */
-        OFFLINE,
-        /**
-         * The <code>ONLINE</code> constant indicates the skype user is online.
-         */
-        ONLINE,
-        /**
-         * The <code>AWAY</code> constant indicates the skype user is away.
-         */
-        AWAY,
-        /**
-         * The <code>NA</code> constant indicates the skype user is not available.
-         */
-        NA,
-        /**
-         * The <code>DND</code> constant indicates the skype user is in do not disturb mode.
-         */
-        DND,
-        /**
-         * The <code>SKYPEOUT</code> constant indicates the skype user is in SkypeOut mode.
-         */
-        SKYPEOUT,
-        /**
-         * The <code>SKYPEME</code> constant indicates the skype user is in SkypeMe mode.
-         */
-        SKYPEME,
+        UNKNOWN, ONLINE, OFFLINE, SKYPEME, AWAY, NA, DND, INVISIBLE, LOGGEDOUT;
     }
 
     /**
@@ -182,16 +217,10 @@ public class User extends SkypeObject {
     public enum Sex {
         /**
          * The <code>UNKNOWN</code> constant indicates the sex of the skype user is unknown.
-         */
-        UNKNOWN,
-        /**
          * The <code>MALE</code> constant indicates the skype user is male.
-         */
-        MALE,
-        /**
          * The <code>FEMALE</code> constant indicates the skype user is female.
          */
-        FEMALE;
+        UNKNOWN, MALE, FEMALE;
     }
     
     /**
@@ -200,26 +229,24 @@ public class User extends SkypeObject {
     public enum BuddyStatus {
         /**
          * The <code>NEVER_BEEN</code> constant indicates the skype user has never been in contact list.
-         */
-        NEVER_BEEN,
-        /**
          * The <code>DELETED</code> constant indicates the skype user is deleted from contact list.
-         */
-        DELETED,
-        /**
          * The <code>PENDING</code> constant indicates the skype user is pending authorisation.
-         */
-        PENDING,
-        /**
          * The <code>ADDED</code> constant indicates the skype user is added to contact list.
          */
-        ADDED
+        NEVER_BEEN, DELETED, PENDING, ADDED;
     }
 
     /** ID of this User. */
     private String id;
+
     private PropertyChangeSupport listeners = new PropertyChangeSupport(this);
 
+    /** List of monitor listeners to USER objects. */
+    private static final List<UserListener> monitorListeners = Collections.synchronizedList(new ArrayList<UserListener>());
+    
+    /** Exception handler to USER object. */
+    private SkypeExceptionHandler exceptionHandler;
+    
     /**
      * Constructor.
      * @param newId The USER ID.
@@ -229,9 +256,22 @@ public class User extends SkypeObject {
     }
 
     /**
+     * Consturctor. Use getInstance instead of constructor.
+     *
+     * @param newId the ID of this USER object.
+     * @param userListener the monitor listener to add..
+     */
+    
+    private User(final String newId, final UserListener userListener) {
+        this.id = newId;
+        addUserListener(userListener);
+    }
+    
+    /**
      * Overridden to provide ID as hashcode.
      * @return ID.
      */
+    @Override
     public final int hashCode() {
         return getId().hashCode();
     }
@@ -241,6 +281,7 @@ public class User extends SkypeObject {
      * @param compared the User to compare to.
      * @return true if ID's are equal.
      */
+    @Override
     public final boolean equals(Object compared) {
         if (compared instanceof User) {
             User comparedUser = (User)compared;
@@ -253,6 +294,7 @@ public class User extends SkypeObject {
      * Provide ID as string representation.
      * @return ID.
      */
+    @Override
     public final String toString() {
         return getId();
     }
@@ -265,6 +307,390 @@ public class User extends SkypeObject {
         return id;
     }
 
+    /**
+     * Add a listener for the monitor field. The listener will be triggered every
+     * time the properties of this USER object is changed.
+     *
+     * @param listener the listener to add.
+     */
+    static void addUserListener(final UserListener userListener) {
+        Utils.checkNotNull("listener", userListener);
+        if (!monitorListeners.contains(userListener)){
+            monitorListeners.add(userListener);
+        }
+    }
+    
+    /**
+     * Remove a listener to the monitor of this USER object. If listener is
+     * already removed nothing happens.
+     *
+     * @param listener the listener to remove.
+     */
+    final void removeUserListener(final UserListener userListener) {
+        Utils.checkNotNull("listener", userListener);
+        monitorListeners.remove(userListener);
+    }
+    
+    /**
+     * Trigger all Status listeners because the status of this USER object has
+     * changed.
+     *
+     * @param status the new status.
+     */
+    protected void fireStatusMonitor(final Status val) {
+        if (val.equals(oldStatus)) {
+            return;
+        }
+        oldStatus = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.statusMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the mood text of this USER object has
+     * changed.
+     *
+     * @param val the new mood text.
+     */
+    protected void fireMoodTextMonitor(String val) {
+        if (val.equals(oldMoodText)) {
+            return;
+        }
+        oldMoodText = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.moodTextMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the full name of this USER object has
+     * changed.
+     *
+     * @param val the new full name.
+     */
+    protected void fireFullNameMonitor(String val) {
+        if (val.equals(oldFullName)) {
+            return;
+        }
+        oldFullName = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.fullNameMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the phone mobile of this USER object has
+     * changed.
+     *
+     * @param val the new phone mobile.
+     */
+    protected void firePhoneMobileMonitor(String val) {
+        if (val.equals(oldPhoneMobile)) {
+            return;
+        }
+        oldPhoneMobile = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.phoneMobileMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the phone home of this USER object has
+     * changed.
+     *
+     * @param val the new phone home.
+     */
+    protected void firePhoneHomeMonitor(String val) {
+        if (val.equals(oldPhoneHome)) {
+            return;
+        }
+        oldPhoneHome = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.phoneHomeMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the phone office of this USER object has
+     * changed.
+     *
+     * @param val the new phone office.
+     */
+    protected void firePhoneOfficeMonitor(String val) {
+        if (val.equals(oldPhoneOffice)) {
+            return;
+        }
+        oldPhoneOffice = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.phoneOfficeMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the display name of this USER object has
+     * changed.
+     *
+     * @param val the new display name.
+     */
+    protected void fireDisplayNameMonitor(String val) {
+        if (val.equals(oldDisplayName)) {
+            return;
+        }
+        oldDisplayName = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.displayNameMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the country of this USER object has
+     * changed.
+     *
+     * @param val the new country.
+     */
+    protected void fireCountryMonitor(String val) {
+        if (val.equals(oldCountry)) {
+            return;
+        }
+        oldCountry = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.countryMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the province of this USER object has
+     * changed.
+     *
+     * @param val the new province.
+     */
+    protected void fireProvinceMonitor(String val) {
+        if (val.equals(oldProvince)) {
+            return;
+        }
+        oldProvince = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.provinceMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the city of this USER object has
+     * changed.
+     *
+     * @param val the new city.
+     */
+    protected void fireCityMonitor(String val) {
+        if (val.equals(oldCity)) {
+            return;
+        }
+        oldCity = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.cityMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the time zone of this USER object has
+     * changed.
+     *
+     * @param val the new time zone.
+     */
+    protected void fireTimeZoneMonitor(String val) {
+        if (val.equals(oldTimeZone)) {
+            return;
+        }
+        oldTimeZone = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.timeZoneMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the sex of this USER object has
+     * changed.
+     *
+     * @param val the new sex.
+     */
+    protected void fireSexMonitor(User.Sex val) {
+        if (val.equals(oldSex)) {
+            return;
+        }
+        oldSex = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.sexMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the home page of this USER object has
+     * changed.
+     *
+     * @param val the new home page.
+     */
+    protected void fireHomePageMonitor(String val) {
+        if (val.equals(oldHomePage)) {
+            return;
+        }
+        oldHomePage = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.homePageMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the birthday of this USER object has
+     * changed.
+     *
+     * @param val the new birthday.
+     */
+    protected void fireBirthdayMonitor(String val) {
+        if (val.equals(oldBirthday)) {
+            return;
+        }
+        oldBirthday = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.birthdayMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the language of this USER object has
+     * changed.
+     *
+     * @param val the new language.
+     */
+    protected void fireLanguageMonitor(String val) {
+        if (val.equals(oldLanguage)) {
+            return;
+        }
+        oldLanguage = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.languageMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the about of this USER object has
+     * changed.
+     *
+     * @param val the new about.
+     */
+    protected void fireAboutMonitor(String val) {
+        if (val.equals(oldAbout)) {
+            return;
+        }
+        oldAbout = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.aboutMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the blocked state of this USER object has
+     * changed.
+     *
+     * @param val the new blocked state.
+     */
+    protected void fireIsBlockedMonitor(boolean val) {
+        if (val == oldIsBlocked) {
+            return;
+        }
+        oldIsBlocked = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.isBlockedMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
+    /**
+     * Trigger all Status listeners because the authorized state of this USER object has
+     * changed.
+     *
+     * @param val the new authorized state.
+     */
+    protected void fireIsAuthorizedMonitor(boolean val) {
+        if (val == oldIsAuthorized) {
+            return;
+        }
+        oldIsAuthorized = val;
+        for (final UserListener listener : monitorListeners) {
+            try {
+                listener.isAuthorizedMonitor(val, this);
+            } catch (Throwable e) {
+                Utils.handleUncaughtException(e, exceptionHandler);
+            }
+        }
+    }
+    
     /**
      * Return full name of this User.
      * @return String with fullname.
