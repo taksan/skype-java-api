@@ -179,7 +179,7 @@ public final class Skype {
         if(path == null) {
             return false;
         }
-        return new File(path).exists();
+        return new File(path.trim()).exists(); // for Java 1.7.0_40 version
     }
 
     /**
