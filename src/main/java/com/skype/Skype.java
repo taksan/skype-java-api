@@ -714,6 +714,19 @@ public final class Skype {
     }
 
     /**
+     * Fetch the all missing messages.
+     *
+     * @throws SkypeException If there is a problem with the connection or state at the Skype client.
+     */
+    public static void getMissedMessages() throws SkypeException {
+        try {
+            getConnectorInstance().getMissedMessages();
+        } catch (ConnectorException ex) {
+            Utils.convertToSkypeException(ex);
+        }
+    }
+
+    /**
      * Gets the all chats which are open in the windows.
      *
      * @return The all chats which are open in the windows
