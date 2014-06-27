@@ -230,6 +230,10 @@ public final class TestConnector extends Connector {
     }
 
     @Override
+    public void getMissedMessages() {
+    }
+
+    @Override
     protected void disposeImpl() {
     }
 
