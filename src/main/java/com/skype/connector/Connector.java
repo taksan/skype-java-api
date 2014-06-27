@@ -545,15 +545,14 @@ public abstract class Connector {
 	  }
 	  String[] ids = data.split(", ");
 
-	  /* they are reversed */
+	  /* message ids are reversed here.
+	   * actually after SEARCH messages appear in #fireMessageReceived
+	   * but in NON-deterministic order, that's why we are forced to
+	   * call it manually & use mutex inside to avoid duplication
+	   * */
 	  for (int i = ids.length - 1; i >= 0; --i) {
 		String id = ids[i];
 		fireMessageReceived("CHATMESSAGE " + id + " STATUS RECEIVED");
-
-		String body_response = execute("GET CHATMESSAGE " + id + " BODY", "");
-		String ts_response = execute("GET CHATMESSAGE " + id + " TIMESTAMP", "");
-		/* System.out.println("Missed: " + body_response + " at: " + ts_response); */
-
 		String seen_response = execute("SET CHATMESSAGE " + id + " SEEN", "");
 	  }
 	}
