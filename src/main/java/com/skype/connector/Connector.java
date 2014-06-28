@@ -147,6 +147,10 @@ public abstract class Connector {
 	 * The flag to check if the connector is already initialized.
 	 */
 	private boolean _isInitialized;
+	/**
+	 * The flag to check missed messages after start
+	 */
+	private boolean _readMissedMessages;
 
 	/** Asynchronous message sender */
 	private ExecutorService _asyncSender;
@@ -521,6 +525,38 @@ public abstract class Connector {
 	protected void sendApplicationName(String applicationName)
 			throws ConnectorException {
 	}
+
+	/**
+	 * Sends the command to read MISSEDMESSAGES
+	 * 
+	 * @throws ConnectorException
+	 *             if sending the protocol version failed
+	 */
+	public void getMissedMessages() throws ConnectorException {
+	  String command = "SEARCH MISSEDMESSAGES";
+	  String responseHeader = "CHATMESSAGES ";
+	  String response = execute(command, responseHeader);
+	  if (response.contains("ERROR")) {
+		return;
+	  }
+	  String data = response.substring(responseHeader.length());
+	  if ("".equals(data)) {
+		return;
+	  }
+	  String[] ids = data.split(", ");
+
+	  /* message ids are reversed here.
+	   * actually after SEARCH messages appear in #fireMessageReceived
+	   * but in NON-deterministic order, that's why we are forced to
+	   * call it manually & use mutex inside to avoid duplication
+	   * */
+	  for (int i = ids.length - 1; i >= 0; --i) {
+		String id = ids[i];
+		fireMessageReceived("CHATMESSAGE " + id + " STATUS RECEIVED");
+		String seen_response = execute("SET CHATMESSAGE " + id + " SEEN", "");
+	  }
+	}
+
 
 	/**
 	 * Sends the Skype API protocol version to use. The default implementation
@@ -1049,6 +1085,11 @@ public abstract class Connector {
 		}
 		if (checkAttached) {
 			assureAttached();
+		}
+		/* consume startup messages */
+		if (!_readMissedMessages && listener.getClass().getName().contains("ChatMessageConnectorListener")) {
+			getMissedMessages();
+			_readMissedMessages = true;
 		}
 	}
 
