@@ -3,7 +3,7 @@
 	<groupId>com.github.taksan</groupId>
 	<artifactId>skype-java-api</artifactId>
 	<name>Skype API</name>
-	<version>1.6-SNAPSHOT</version>
+	<version>1.6</version>
 	<url>http://taksan.github.com/skype-java-api/</url>
 	<scm>
 		<connection>scm:git:git@github.com:taksan/skype-java-api.git</connection>
