@@ -235,6 +235,15 @@ public final class ChatMessage extends SkypeObject {
     public void setContent(final String content) throws SkypeException {
         setProperty("BODY", content);
     }
+    /**
+     * Sets the content of the chat message to the specified string.
+     * @see #getStatus
+     * @since Protocol 7 (API version 3.0)
+     * @throws SkypeException when the connection has gone bad.
+     */
+    public void setSeen() throws SkypeException {
+        Utils.setProperty("CHATMESSAGE", getId(), "SEEN", "", "CHATMESSAGE "+getId()+" STATUS READ");
+    }
 
     /**
      * Indicates if the chat message is editable.
