@@ -236,8 +236,7 @@ public final class ChatMessage extends SkypeObject {
         setProperty("BODY", content);
     }
     /**
-     * Sets the content of the chat message to the specified string.
-     * @see #getStatus
+     * Set the seen of the chat message.
      * @since Protocol 7 (API version 3.0)
      * @throws SkypeException when the connection has gone bad.
      */
