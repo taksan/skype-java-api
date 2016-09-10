@@ -1,3 +1,32 @@
+# Important: Desktop API is crippled now
+
+As time passes, this project becomes less and less relevant due to Desktop API discontinuation. The API discontinuation
+was a hard blow and it is the reason I stopped maintaining the project. Here's the relevant blog post quote:
+
+> Previously we shared that we would retire the Desktop API later this year. However, I’m happy to share that we will 
+be extending support for two of the most widely used features – call recording and compatibility with hardware devices – 
+until we determine alternative options or retire the current solution. Although chat via third party applications, 
+will cease to work as previously communicated
+
+Source: https://blogs.skype.com/2013/11/06/feature-evolution-and-support-for-the-skype-desktop-api/
+
+Another relevant info:
+
+> Important: As communicated in this blog post, due to technology improvements we are making to the Skype experience, some
+features of the API will stop working with Skype for desktop. For example, delivery of chat messages using the API will 
+cease to work. However, we will be extending support for two of the most widely used features – call recording and compatibility 
+with hardware devices – until we determine alternative options or retire the current solution.
+
+According with issue #81, the chat support already stopped working. 
+
+So, this is it. I already stopped supporting the api unofficially back when I learned about the discontinuation,
+but now I'm officially dropping all support. 
+
+Thanks everyone for using the API.
+
+# Old Documentation follows
+
+
 This project is a mavenization and release of Skype4Java with several bug fixes.
 
 * 1.4 RELEASED
