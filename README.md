@@ -29,7 +29,7 @@ Thanks everyone for using the API.
 
 This project is a mavenization and release of Skype4Java with several bug fixes.
 
-* 1.4 RELEASED
+## 1.4 RELEASED
 
 Several bugfixes and a few features have been added to this version. 
 
